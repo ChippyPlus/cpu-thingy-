@@ -36,6 +36,7 @@ fun Instruction.or(register1: Register, register2: Register, register3: Register
 }
 
 fun Instruction.not(register1: Register, register2: Register) {
+    useful
     val r1 = register1.read()
     val result = (r1.toInt().inv()).toShort()
     register2.write(result)
