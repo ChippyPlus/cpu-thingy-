@@ -25,7 +25,7 @@ fun Instruction.swp(register1: Register, register2: Register) {
     register2.write(temp)
 }
 
-fun Instruction.li(register: Register, value: Byte) {
+fun Instruction.li(register: Register, value: Short) {
     useful
     register.write(value)
 }

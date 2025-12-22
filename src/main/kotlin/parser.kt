@@ -42,7 +42,7 @@ object Parser {
                 "mul" -> mul(args[0].toRegister(), args[1].toRegister(), args[2].toRegister())
                 "div" -> div(args[0].toRegister(), args[1].toRegister(), args[2].toRegister())
                 "mov" -> mov(args[0].toRegister(), args[1].toRegister())
-                "li" -> li(args[0].toRegister(), args[1].toByte())
+                "li" -> li(args[0].toRegister(), args[1].toShort())
                 "swp" -> swp(args[0].toRegister(), args[1].toRegister())
                 "pr" -> println(args[0].toRegister().read())
                 else -> throw IllegalArgumentException("Unknown instruction: $command")

@@ -13,10 +13,10 @@ enum class Register {
 
     ;
 
-    private var data: Byte = 0
+    private var data: Short = 0
     private var dataIfPc = 0u
-    fun read(): Byte = data
-    fun write(data: Byte) {
+    fun read(): Short = data
+    fun write(data: Short) {
         if (this == PC) throw IllegalStateException("Writing to PC is not allowed!!!!")
         this.data = data
     }

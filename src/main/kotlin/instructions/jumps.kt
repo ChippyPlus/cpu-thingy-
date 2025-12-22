@@ -10,14 +10,14 @@ fun Instruction.j(line: UInt) {
 
 fun Instruction.jnz(line: UInt, register: Register) {
     useful
-    if (register.read() != 0.toByte()) {
+    if (register.read() != 0.toShort()) {
         Register.PC.writeToPc(line)
     }
 }
 
 fun Instruction.jz(line: UInt, register: Register) {
     useful
-    if (register.read() == 0.toByte()) {
+    if (register.read() == 0.toShort()) {
         Register.PC.writeToPc(line)
     }
 }
