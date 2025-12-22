@@ -3,9 +3,7 @@ package org.cuttlefish
 import org.cuttlefish.data.Register
 import org.cuttlefish.instructions.*
 
-class Parser {
-    private val instruction = Instruction()
-
+object Parser {
     fun parse(input: String) {
         input.lineSequence().forEach { line ->
             val trimmed = line.trim()
@@ -20,7 +18,7 @@ class Parser {
         val command = parts[0]
         val args = parts.drop(1)
 
-        with(instruction) {
+        with(Instruction) {
             when (command) {
                 "push" -> push(args[0].toRegister())
                 "pop" -> pop(args[0].toRegister())
@@ -46,13 +44,13 @@ class Parser {
                 "mov" -> mov(args[0].toRegister(), args[1].toRegister())
                 "li" -> li(args[0].toRegister(), args[1].toByte())
                 "swp" -> swp(args[0].toRegister(), args[1].toRegister())
-
+                "pr" -> println(args[0].toRegister().read())
                 else -> throw IllegalArgumentException("Unknown instruction: $command")
             }
         }
     }
 
     private fun String.toRegister(): Register {
-        return Register.valueOf(this)
+        return Register.valueOf(this.uppercase())
     }
 }

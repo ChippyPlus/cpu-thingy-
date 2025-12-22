@@ -1,0 +1,5 @@
+li r1 25
+li r2 30
+add r1 r2 r1
+
+pr r1

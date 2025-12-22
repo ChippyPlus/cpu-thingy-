@@ -1,5 +1,5 @@
 package org.cuttlefish.instructions
 
-class Instruction {
+object Instruction {
     val useful = null
 }
