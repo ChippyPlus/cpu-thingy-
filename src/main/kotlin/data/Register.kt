@@ -1,7 +1,7 @@
 package org.cuttlefish.data
 
 enum class Register {
-    R1, R2, R3, R4, PC;
+    R1, R2, R3, R4, PC,R6,R7,R8;
 
     private var data: Short = 0
     private var dataIfPc: UShort = 0u

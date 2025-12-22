@@ -22,9 +22,9 @@ object Parser {
             when (command) {
                 "push" -> push(args[0].toRegister())
                 "pop" -> pop(args[0].toRegister())
-                "j" -> j(args[0].toUInt())
-                "jnz" -> jnz(args[0].toUInt(), args[1].toRegister())
-                "jz" -> jz(args[0].toUInt(), args[1].toRegister())
+                "j" -> j(args[0].toUShort())
+                "jnz" -> jnz(args[0].toUShort(), args[1].toRegister())
+                "jz" -> jz(args[0].toUShort(), args[1].toRegister())
                 "eq" -> eq(args[0].toRegister(), args[1].toRegister(), args[2].toRegister())
                 "neq" -> neq(args[0].toRegister(), args[1].toRegister(), args[2].toRegister())
                 "lt" -> lt(args[0].toRegister(), args[1].toRegister(), args[2].toRegister())
@@ -50,7 +50,7 @@ object Parser {
         }
     }
 
-    private fun String.toRegister(): Register {
+    fun String.toRegister(): Register {
         return Register.valueOf(this.uppercase())
     }
 }
