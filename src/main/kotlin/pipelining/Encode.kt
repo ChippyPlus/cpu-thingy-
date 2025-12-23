@@ -3,13 +3,14 @@ package org.cuttlefish.pipelining
 import org.cuttlefish.Parser.toRegister
 import org.cuttlefish.instructions.Instruction
 import org.cuttlefish.instructions.InstructionType
+import java.io.File
 import kotlin.math.pow
 import kotlin.text.toString
 
 class Encode(val instructStr: String) {
     val name = instructStr.split(" ")[0]
-    var full: UShort = 0u
-    var full2: UShort = 0u
+    var full: Short = 0
+    var full2: Short? = null
 
     init {
         opcode()
@@ -30,10 +31,11 @@ class Encode(val instructStr: String) {
             }
 
             InstructionType.Immediates -> {
-                half(0)
+                full2 = 0
+                half(1)
                 immediate(instructStr.split(' ')[2].toShort())
                 opcodeOther()
-                halfOther(1)
+                halfOther(0)
                 immediateOther(instructStr.split(' ')[2].toShort())
             }
 
@@ -48,64 +50,74 @@ class Encode(val instructStr: String) {
 
     fun opcode() {
         val code = (Instruction.mappings[name]!![1] as Number).toByte()
-        full = code.toUShort()
-        full = (full.toInt() shl 16 - 5).toUShort()
+        full = code.toShort()
+        full = (full.toInt() shl 16 - 5).toShort()
     }
     fun opcodeOther() {
         val code = (Instruction.mappings[name]!![1] as Number).toByte()
-        full2 = code.toUShort()
-        full2 = (full2.toInt() shl 16 - 5).toUShort()
+        full2 = code.toShort()
+        full2 = (full2!!.toInt() shl 16 - 5).toShort()
     }
 
     fun half(half: Byte) {
         val shift = (half.toInt() shl 16 - 5) shr 1
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
     fun halfOther(half: Byte) {
         val shift = (half.toInt() shl 16 - 5) shr 1
-        full2 = (full2.toInt() or shift).toUShort()
+        full2 = (full2!!.toInt() or shift).toShort()
     }
 
 
     fun immediate(number: Short) {
-        val shift = ((number.toInt() shl 16 - 5) shr 9) shr 5 + 1
-        full = (full.toInt() or shift).toUShort()
+        val shift = (number.toInt() and 0xFF) shl 2
+        full = (full.toInt() or shift).toShort()
     }
-    fun immediateOther(number: Short) { // 00110100
-        val nNoShift = number.toInt() shr 8 shl 2
-        val mask = (2.0.pow(6) - 1).toInt() shl 16 -6// 63 ?
-//        val shift = nNoShift or mask
-//        println(shift.toString(2).padStart(16, '0'))
-//        val shift = ((number.toInt() shl 16 - 5) shr 9) shr 5 + 1
-        full2 = (full2.toInt() or nNoShift).toUShort()
+    fun immediateOther(number: Short) {
+        val shift = ((number.toInt() shr 8) and 0xFF) shl 2
+        full2 = (full2!!.toInt() or shift).toShort()
     }
 
 
     fun register1() {
         val ordinal = instructStr.split(' ')[1].toRegister().ordinal
         val shift = (ordinal shl 16 - 5) shr 3
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
     fun register2() {
         val ordinal = instructStr.split(' ')[2].toRegister().ordinal
         val shift = ((ordinal shl 16 - 5) shr 3) shr 3
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
     fun register3() {
         val ordinal = instructStr.split(' ')[2].toRegister().ordinal
         val shift = (((ordinal shl 16 - 5) shr 3) shr 3) shr 3
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
 }
 
 fun main() {
-    val sh = Short.MAX_VALUE / 2 - 3000
-    val x = Encode("li r8 $sh") // 11111110000
-    println(x.full.toString(2).padStart(16, '0').removeRange(0..5).removeRange(8,10))
-    println(x.full2.toString(2).padStart(16, '0').removeRange(0..5).removeRange(8,10))
-    println("0011010011010001".toInt(2))
-    println(sh)
+    val memory = ShortArray(64) {0}
+    
+//    val sh = Short.MAX_VALUE / 2-3000 //11111111111111
+//    val x = Encode("li r8 $sh") // 11111110000
+//    println(x.full.toString(2).padStart(16, '0').removeRange(0..5).removeRange(8,10))
+//    println(x.full2!!.toString(2).padStart(16, '0').removeRange(0..5).removeRange(8,10))
+//    println("0011010001000111".toInt(2))
+//    println(sh)
+    val text = File("main.lx").readLines()
+    for (line in text) {
+        val encode = Encode(line)
+        println("$line 1 : ${encode.full.toString(2).padStart(16, '0')}")
+        println(encode.full2)
+        if (encode.full2 != null) {
+            println("$line 2 : ${encode.full2!!.toString(2).padStart(16, '0')}")
+
+        }
+    }
+    
+
 }

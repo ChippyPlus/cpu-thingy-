@@ -29,3 +29,7 @@ fun Instruction.li(register: Register, value: Short) {
     useful
     register.write(value)
 }
+fun Instruction.pr(register: Register) {
+    useful
+    println(register.read())
+}

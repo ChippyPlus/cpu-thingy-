@@ -27,6 +27,8 @@ object Instruction {
         "mov" to listOf(::mov, 21, InstructionType.Register2),
         "swp" to listOf(::swp, 21, InstructionType.Register2),
         "li" to listOf(::li, 22, InstructionType.Immediates),
+        "pr" to listOf(::pr, 23, InstructionType.Register1)
+
 
         )
 }
