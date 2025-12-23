@@ -2,7 +2,6 @@ package org.cuttlefish.pipelining
 
 import org.cuttlefish.Parser.toRegister
 import org.cuttlefish.data.Register
-import org.cuttlefish.instructions.Instruction
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
 import java.io.File
@@ -14,7 +13,7 @@ class Encode(val instructStr: String) {
 
     init {
         opcode()
-        when (Instruction.mappings[name]!![2] as InstructionType) {
+        when (mappings[name]!![2] as InstructionType) {
             InstructionType.Register1 -> {
                 register1()
             }
@@ -40,7 +39,15 @@ class Encode(val instructStr: String) {
             }
 
             InstructionType.StandAlone -> {}
-            InstructionType.RegisterImmediates -> {}
+            InstructionType.RegisterImmediates -> {
+                register1()
+                val number = instructStr.split(' ')[2].toShort()
+                val shift = (number.toInt() and 0xFF)
+                full = (full.toInt() or shift).toUShort()
+                opcodeOther()
+                halfOther(0)
+                immediateOther(number)
+            }
         }
 
 
@@ -49,13 +56,13 @@ class Encode(val instructStr: String) {
     }
 
     fun opcode() {
-        val code = (Instruction.mappings[name]!![1] as Number).toByte()
+        val code = (mappings[name]!![1] as Number).toByte()
         full = code.toUShort()
         full = (full.toInt() shl 16 - 5).toUShort()
     }
 
     fun opcodeOther() {
-        val code = (Instruction.mappings[name]!![1] as Number).toByte()
+        val code = (mappings[name]!![1] as Number).toByte()
         full2 = code.toUShort()
         full2 = (full2!!.toInt() shl 16 - 5).toUShort()
     }
@@ -95,7 +102,7 @@ class Encode(val instructStr: String) {
     }
 
     fun register3() {
-        val ordinal = instructStr.split(' ')[2].toRegister().ordinal
+        val ordinal = instructStr.split(' ')[3].toRegister().ordinal
         val shift = (((ordinal shl 16 - 5) shr 3) shr 3) shr 3
         full = (full.toInt() or shift).toUShort()
     }
@@ -121,8 +128,8 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
             InstructionType.Register3 -> {
                 val removedOpcode = (full1.toInt() shl 5).toUShort()
                 val shift1 = (removedOpcode.toInt() shr 16 - 3).toUShort()
-                val shift2 = (removedOpcode.toInt() shr 16 - 6).toUShort()
-                val shift3 = (removedOpcode.toInt() shr 16 - 9).toUShort()
+                val shift2 = ((removedOpcode.toInt() shl 3).toUShort().toInt() shr 16 - 3).toUShort()
+                val shift3 = ((removedOpcode.toInt() shl 6).toUShort().toInt() shr 16 - 3).toUShort()
                 return listOf(
                     Register.entries[shift1.toInt()], Register.entries[shift2.toInt()], Register.entries[shift3.toInt()]
                 )
@@ -131,7 +138,7 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
             InstructionType.Register2 -> {
                 val removedOpcode = (full1.toInt() shl 5).toUShort()
                 val shift1 = (removedOpcode.toInt() shr 16 - 3).toUShort()
-                val shift2 = (removedOpcode.toInt() shr 16 - 6).toUShort()
+                val shift2 = ((removedOpcode.toInt() shl 3).toUShort().toInt() shr 16 - 3).toUShort()
                 return listOf(
                     Register.entries[shift1.toInt()], Register.entries[shift2.toInt()]
                 )
@@ -164,14 +171,27 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
             }
 
             InstructionType.StandAlone -> {
-
+                return listOf()
             }
 
             InstructionType.RegisterImmediates -> {
+                val halfImmediate1 = (full1.toInt() shl 8).toUShort().toInt() shr 8
+                val imm1 = halfImmediate1.toShort()
+                val register =
+                    Register.entries[((full1.toInt() shl 5).toUShort().toInt() shr 16 - 3).toUShort().toInt()]
 
+                val removedOpcode2 = (full2!!.toInt() shl 5).toUShort()
+                val half2 = (removedOpcode2.toInt() shr 16 - 1).toUShort()
+                val halfImmediate2 = (full2.toInt() shl 6).toUShort().toInt() shr 8
+                val immediate2 = if (half2.toUInt() == 1u) {
+                    halfImmediate2.toShort()
+                } else if (half2.toUInt() == 0u) {
+                    (halfImmediate2.toShort().toInt() shl 8).toShort()
+                } else throw IllegalStateException("Half ≠ 0 or 1, impossible?")
+
+                return listOf(register, (imm1.toInt() or immediate2.toInt()).toUShort())
             }
         }
-        return TODO("Provide the return value")
     }
 
 
