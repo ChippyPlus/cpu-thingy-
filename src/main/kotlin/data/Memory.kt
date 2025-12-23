@@ -18,8 +18,8 @@ object Memory {
     }
 
     private fun validAddress(address: Short): Boolean {
-        if (address in 0..<SIZE) {
-            throw IllegalStateException("Out of bounds address!!! ($address)")
+        if (address !in 0..<SIZE) {
+            return false
         }
         return true
     }
