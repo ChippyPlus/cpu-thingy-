@@ -1,6 +1,7 @@
 package org.cuttlefish.instructions
 
 import org.cuttlefish.data.Register
+import org.cuttlefish.data.RegisterValue
 
 
 fun Instruction.j(line: UShort) {
@@ -8,16 +9,16 @@ fun Instruction.j(line: UShort) {
     Register.PC.writeToPc(line)
 }
 
-fun Instruction.jnz(line: UShort, register: Register) {
+fun Instruction.jnz(line: UShort, register: RegisterValue) {
     useful
-    if (register.read() != 0.toShort()) {
+    if (register.value != 0.toShort()) {
         Register.PC.writeToPc(line)
     }
 }
 
-fun Instruction.jz(line: UShort, register: Register) {
+fun Instruction.jz(line: UShort, register: RegisterValue) {
     useful
-    if (register.read() == 0.toShort()) {
+    if (register.value == 0.toShort()) {
         Register.PC.writeToPc(line)
     }
 }

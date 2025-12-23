@@ -1,51 +1,46 @@
 package org.cuttlefish.instructions
 
-import org.cuttlefish.data.Memory
-import org.cuttlefish.data.Register
-import org.cuttlefish.data.Stack
+import org.cuttlefish.data.*
 
-fun Instruction.pop(register: Register) {
+fun Instruction.pop(register: RegisterAddress): WriteBackOutput {
     useful
-    register.write(Stack.pop())
+    return WriteBackOutput(Stack.pop(), register)
 }
 
-fun Instruction.push(register: Register) {
+fun Instruction.push(register: RegisterValue) {
     useful
-    Stack.push(register.read())
+    Stack.push(register.value)
 }
 
-fun Instruction.mov(register1: Register, register2: Register) {
+fun Instruction.mov(register1: RegisterValue, register2: RegisterAddress): WriteBackOutput {
     useful
-    register2.write(register1.read())
+    return WriteBackOutput(register1.value, register2)
 }
 
-fun Instruction.swp(register1: Register, register2: Register) {
+fun Instruction.li(register: RegisterAddress, value: Short): WriteBackOutput {
     useful
-    val temp = register1.read()
-    register1.write(register2.read())
-    register2.write(temp)
+    return WriteBackOutput(value, register)
 }
 
-fun Instruction.li(register: Register, value: Short) {
+fun Instruction.pr(register: RegisterValue) {
     useful
-    register.write(value)
-}
-
-fun Instruction.pr(register: Register) {
-    useful
-    println(register.read())
+    println(register.value)
 }
 
 
-fun Instruction.load(register1: Register, address: Register) {
+fun Instruction.load(register1: RegisterValue, address: RegisterAddress): WriteBackOutput {
     useful
-    val memoryOut = Memory.read(address.read())
-    register1.write(memoryOut)
+//    return null
+//    val memoryOut = Memory.read(address.read())
+//    register1.write(memoryOut)
+    return WriteBackOutput(register1.value, address)
+
 }
 
-fun Instruction.store(register1: Register, address: Register) {
+fun Instruction.store(register1: Register, address: MemoryAddress): MEMWruteBackOutput {
     useful
-    val memoryIn = register1.read()
-    val address = address.read()
-    Memory.write(address, memoryIn)
+//    val memoryIn = register1.read()
+//    val address = address.read()
+//    Memory.write(address, memoryIn)
+    return MEMWruteBackOutput(register1.read(), address)
 }
