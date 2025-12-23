@@ -19,12 +19,14 @@ class IF {
         val type = opcodeMap[opcode]
 
         Register.PC.writePrivilege((pc + 1u).toUShort())
+        Register.INSTR.writePrivilege(full1)
 
         var full2: UShort? = null
         if (type == InstructionType.Immediates || type == InstructionType.RegisterImmediates) {
             val nextPc = Register.PC.readPrivilege()
             full2 = Memory.read(nextPc.toShort()).toUShort()
             Register.PC.writePrivilege((nextPc + 1u).toUShort())
+            Register.INSTR.writePrivilege(full2)
         }
 
         return listOf(full1, full2)
