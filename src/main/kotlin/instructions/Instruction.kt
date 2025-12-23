@@ -19,7 +19,7 @@ object Instruction {
         "and" to listOf(::and, 13, InstructionType.Register3),
         "or" to listOf(::or, 14, InstructionType.Register3),
         "xor" to listOf(::xor, 15, InstructionType.Register3),
-        "not" to listOf(::not, 16, InstructionType.Register3),
+        "not" to listOf(::not, 16, InstructionType.Register2),
         "add" to listOf(::add, 17, InstructionType.Register3),
         "sub" to listOf(::sub, 18, InstructionType.Register3),
         "mul" to listOf(::mul, 19, InstructionType.Register3),
