@@ -31,10 +31,10 @@ class Encode(val instructStr: String) {
             InstructionType.Immediates -> {
                 full2 = 0u
                 half(1)
-                immediate(instructStr.split(' ')[2].toShort())
+                immediate(instructStr.split(' ')[if (name == "j") 1 else 2].toShort())
                 opcodeOther()
                 halfOther(0)
-                immediateOther(instructStr.split(' ')[2].toShort())
+                immediateOther(instructStr.split(' ')[if (name == "j") 1 else 2].toShort())
             }
 
             InstructionType.StandAlone -> {}
