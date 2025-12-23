@@ -140,19 +140,19 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
             InstructionType.Immediates -> {
                 val removedOpcode1 = (full1.toInt() shl 5).toUShort()
                 val half1 = (removedOpcode1.toInt() shr 16 - 1).toUShort()
-                val halfImmediate1 = (full1.toInt() shl 6).toUShort().toInt() shr 10
-                val immediate1 = if (half1.toUInt() == 0u) {
+                val halfImmediate1 = (full1.toInt() shl 6).toUShort().toInt() shr 8
+                val immediate1 = if (half1.toUInt() == 1u) {
                     halfImmediate1.toShort()
-                } else if (half1.toUInt() == 1u) {
+                } else if (half1.toUInt() == 0u) {
                     (halfImmediate1.toShort().toInt() shl 8).toShort()
                 } else throw IllegalStateException("Half ≠ 0 or 1, impossible?")
 
                 val removedOpcode2 = (full2!!.toInt() shl 5).toUShort()
                 val half2 = (removedOpcode2.toInt() shr 16 - 1).toUShort()
-                val halfImmediate2 = (full2.toInt() shl 6).toUShort().toInt() shr 10
-                val immediate2 = if (half2.toUInt() == 0u) {
+                val halfImmediate2 = (full2.toInt() shl 6).toUShort().toInt() shr 8
+                val immediate2 = if (half2.toUInt() == 1u) {
                     halfImmediate2.toShort()
-                } else if (half2.toUInt() == 1u) {
+                } else if (half2.toUInt() == 0u) {
                     (halfImmediate2.toShort().toInt() shl 8).toShort()
                 } else throw IllegalStateException("Half ≠ 0 or 1, impossible?")
 
