@@ -25,9 +25,9 @@ object Instruction {
         "mul" to listOf(::mul, 19, InstructionType.Register3),
         "div" to listOf(::div, 20, InstructionType.Register3),
         "mov" to listOf(::mov, 21, InstructionType.Register2),
-        "swp" to listOf(::swp, 21, InstructionType.Register2),
-        "li" to listOf(::li, 22, InstructionType.Immediates),
-        "pr" to listOf(::pr, 23, InstructionType.Register1)
+        "swp" to listOf(::swp, 22, InstructionType.Register2),
+        "li" to listOf(::li, 23, InstructionType.Immediates),
+        "pr" to listOf(::pr, 24, InstructionType.Register1)
 
 
         )
