@@ -1,5 +1,6 @@
 package org.cuttlefish.instructions
 
+import org.cuttlefish.data.Memory
 import org.cuttlefish.data.Register
 import org.cuttlefish.data.Stack
 
@@ -29,7 +30,22 @@ fun Instruction.li(register: Register, value: Short) {
     useful
     register.write(value)
 }
+
 fun Instruction.pr(register: Register) {
     useful
     println(register.read())
+}
+
+
+fun Instruction.load(register1: Register, address: Register) {
+    useful
+    val memoryOut = Memory.read(address.read())
+    register1.write(memoryOut)
+}
+
+fun Instruction.store(register1: Register, address: Register) {
+    useful
+    val memoryIn = register1.read()
+    val address = address.read()
+    Memory.write(address, memoryIn)
 }

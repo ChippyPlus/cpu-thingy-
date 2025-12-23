@@ -49,4 +49,3 @@ enum class InstructionType {
 
 }
 
-//data class FmtRegister1()
