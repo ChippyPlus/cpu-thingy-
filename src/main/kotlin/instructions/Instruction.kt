@@ -4,7 +4,7 @@ object Instruction {
     val useful = null
     val mappings = mapOf(
         "push" to listOf(::push, 0, InstructionType.Register1),
-        "pop" to listOf(::pop, 1, InstructionType.StandAlone),
+        "pop" to listOf(::pop, 1, InstructionType.Register1),
         "j" to listOf(::j, 2, InstructionType.Immediates),
         "jnz" to listOf(::jnz, 3, InstructionType.RegisterImmediates),
         "jz" to listOf(::jz, 4, InstructionType.RegisterImmediates),

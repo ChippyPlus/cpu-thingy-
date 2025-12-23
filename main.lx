@@ -1,4 +1,4 @@
 li r1 25
 li r2 32767
 add r4 r3 r4
-pr r8
+pr r2

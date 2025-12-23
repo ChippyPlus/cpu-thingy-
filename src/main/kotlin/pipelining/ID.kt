@@ -1,6 +1,8 @@
 package org.cuttlefish.pipelining
 
 import org.cuttlefish.data.Register
+import org.cuttlefish.data.RegisterAddress
+import org.cuttlefish.data.RegisterValue
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
 
@@ -10,13 +12,13 @@ import org.cuttlefish.instructions.InstructionType
  */
 class ID(val full1: UShort, val full2: UShort? = null) {
     val name = name()
-
+    val fmt = mappings[name]!![2] as InstructionType
     fun name(): String {
         val number = (full1.toInt() shr 16 - 5).toUShort()
         return mappings.entries.map { it.value[1] to it.key }.find { it.first == number.toInt() }!!.second
     }
 
-    fun fmt(): List<Any> {
+    fun fmtStructure(): List<Any> {
         when (mappings[name]!![2] as InstructionType) {
             InstructionType.Register1 -> {
                 val removedOpcode = (full1.toInt() shl 5).toUShort()
@@ -31,7 +33,9 @@ class ID(val full1: UShort, val full2: UShort? = null) {
                 val shift3 = ((removedOpcode.toInt() shl 6).toUShort().toInt() shr 16 - 3).toUShort()
                 return listOf(
                     name,
-                    Register.entries[shift1.toInt()], Register.entries[shift2.toInt()], Register.entries[shift3.toInt()]
+                    Register.entries[shift1.toInt()],
+                    Register.entries[shift2.toInt()],
+                    Register.entries[shift3.toInt()]
                 )
             }
 
@@ -40,8 +44,7 @@ class ID(val full1: UShort, val full2: UShort? = null) {
                 val shift1 = (removedOpcode.toInt() shr 16 - 3).toUShort()
                 val shift2 = ((removedOpcode.toInt() shl 3).toUShort().toInt() shr 16 - 3).toUShort()
                 return listOf(
-                    name,
-                    Register.entries[shift1.toInt()], Register.entries[shift2.toInt()]
+                    name, Register.entries[shift1.toInt()], Register.entries[shift2.toInt()]
                 )
             }
 
@@ -94,5 +97,55 @@ class ID(val full1: UShort, val full2: UShort? = null) {
             }
         }
     }
+
+    fun fillInRegisters(): List<Any> {
+        val structure = fmtStructure()
+        val newStructure = mutableListOf<Any>()
+        newStructure.add(structure[0])
+        when (fmt) {
+            InstructionType.Register1 -> {
+                if (name == "pr") {
+                    newStructure.add(RegisterValue((structure[1] as Register).read()))
+                } else {
+                    newStructure.add(RegisterAddress((structure[1] as Register)))
+                }
+            }
+
+            InstructionType.Register3 -> {
+                newStructure.add(RegisterValue((structure[1] as Register).read()))
+                newStructure.add(RegisterValue((structure[2] as Register).read()))
+                newStructure.add(RegisterAddress((structure[3] as Register)))
+            }
+
+            InstructionType.Register2 -> {
+                newStructure.add(RegisterValue((structure[1] as Register).read()))
+                newStructure.add(RegisterAddress((structure[2] as Register)))
+            }
+
+            InstructionType.Immediates -> {
+                newStructure.add(RegisterValue((structure[1] as Short)))
+            }
+
+            InstructionType.StandAlone -> {
+
+            }
+
+            InstructionType.RegisterImmediates -> {
+
+                if (name == "li") {
+                    newStructure.add(RegisterAddress((structure[1] as Register)))
+                } else {
+                    newStructure.add(RegisterValue((structure[1] as Register).read()))
+                }
+
+                newStructure.add((structure[2] as UShort).toShort())
+
+            }
+        }
+
+        return newStructure
+
+    }
+
 
 }

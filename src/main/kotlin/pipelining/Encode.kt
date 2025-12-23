@@ -134,7 +134,7 @@ fun main() {
         } else {
             full2 = null
         }
-        println(ID(full1, full2).fmt())
+        println(ID(full1, full2).fmtStructure())
         Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
     }
 }
