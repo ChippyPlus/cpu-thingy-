@@ -104,7 +104,7 @@ class ID(val full1: UShort, val full2: UShort? = null) {
         newStructure.add(structure[0])
         when (fmt) {
             InstructionType.Register1 -> {
-                if (name == "pr") {
+                if (name == "pr" || name == "push") {
                     newStructure.add(RegisterValue((structure[1] as Register).read()))
                 } else {
                     newStructure.add(RegisterAddress((structure[1] as Register)))

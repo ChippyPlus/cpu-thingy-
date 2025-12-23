@@ -19,7 +19,7 @@ class EX(decoded: ID) {
         when (fmt) {
             InstructionType.Register1 -> {
 
-                if (name == "pr") {
+                if (!(name != "pr" && name != "push")) {
                     @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
                 } else {
                     @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress) -> Unit).invoke(fmtStructure[1] as RegisterAddress)
