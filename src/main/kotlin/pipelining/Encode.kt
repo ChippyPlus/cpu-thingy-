@@ -109,7 +109,6 @@ class Encode(val instructStr: String) {
 
 }
 
-
 class Decode(val full1: UShort, val full2: UShort? = null) {
     val name = name()
     fun name(): String {
@@ -122,7 +121,7 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
             InstructionType.Register1 -> {
                 val removedOpcode = (full1.toInt() shl 5).toUShort()
                 val shift = (removedOpcode.toInt() shr 16 - 3).toUShort()
-                return listOf(Register.entries[shift.toInt()]) // the only unique data
+                return listOf(name,Register.entries[shift.toInt()]) // the only unique data
             }
 
             InstructionType.Register3 -> {
@@ -130,7 +129,7 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
                 val shift1 = (removedOpcode.toInt() shr 16 - 3).toUShort()
                 val shift2 = ((removedOpcode.toInt() shl 3).toUShort().toInt() shr 16 - 3).toUShort()
                 val shift3 = ((removedOpcode.toInt() shl 6).toUShort().toInt() shr 16 - 3).toUShort()
-                return listOf(
+                return listOf(name,
                     Register.entries[shift1.toInt()], Register.entries[shift2.toInt()], Register.entries[shift3.toInt()]
                 )
             }
@@ -139,7 +138,7 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
                 val removedOpcode = (full1.toInt() shl 5).toUShort()
                 val shift1 = (removedOpcode.toInt() shr 16 - 3).toUShort()
                 val shift2 = ((removedOpcode.toInt() shl 3).toUShort().toInt() shr 16 - 3).toUShort()
-                return listOf(
+                return listOf(name,
                     Register.entries[shift1.toInt()], Register.entries[shift2.toInt()]
                 )
             }
@@ -167,11 +166,11 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
 
 
 
-                return listOf((immediate2.toInt() or immediate1.toInt()).toUShort())
+                return listOf(name,(immediate2.toInt() or immediate1.toInt()).toUShort())
             }
 
             InstructionType.StandAlone -> {
-                return listOf()
+                return listOf(name)
             }
 
             InstructionType.RegisterImmediates -> {
@@ -189,7 +188,7 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
                     (halfImmediate2.toShort().toInt() shl 8).toShort()
                 } else throw IllegalStateException("Half ≠ 0 or 1, impossible?")
 
-                return listOf(register, (imm1.toInt() or immediate2.toInt()).toUShort())
+                return listOf(name,register, (imm1.toInt() or immediate2.toInt()).toUShort())
             }
         }
     }
@@ -200,24 +199,35 @@ class Decode(val full1: UShort, val full2: UShort? = null) {
 
 fun main() {
     val memory = ShortArray(64) { 0 }
-
-//    val sh = Short.MAX_VALUE / 2-3000 //11111111111111
-//    val x = Encode("li r8 $sh") // 11111110000
-//    println(x.full.toString(2).padStart(16, '0').removeRange(0..5).removeRange(8,10))
-//    println(x.full2!!.toString(2).padStart(16, '0').removeRange(0..5).removeRange(8,10))
-//    println("0011010001000111".toInt(2))
-//    println(sh)
-    val text = File("main.lx").readLines()
-    for (line in text) {
+    var index = 0
+    for (line in File("main.lx").readLines()) {
         val encode = Encode(line)
-        println("$line 1 : ${encode.full.bin()}")
-        println(Decode(encode.full, encode.full2).fmt())
-        //        println(encode.full2)
-//        if (encode.full2 != null) {
-//            println("$line 2 : ${encode.full2!!.toString(2).padStart(16, '0')}")
-//
-//        }
+        memory[index] = encode.full.toShort()
+        index++
+        if (encode.full2 != null) {
+            memory[index] = encode.full2!!.toShort()
+            index++
+        }
+    }
+
+    val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
+    var pc = 0
+    while (pc < index) {
+        val full1 = memory[pc].toUShort()
+        val opcode = full1.toInt() shr (16 - 5)
+        val type = opcodeMap[opcode]
+        val full2: UShort?
+        if (type == InstructionType.Immediates || type == InstructionType.RegisterImmediates) {
+            pc++
+            full2 = memory[pc].toUShort()
+        } else {
+            full2 = null
+        }
+        println(Decode(full1, full2).fmt())
+        pc++
     }
 }
 
+/** Debugging */
+@Suppress("unused")
 fun UShort.bin() = this.toString(2).padStart(16, '0')
