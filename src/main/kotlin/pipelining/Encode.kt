@@ -1,6 +1,5 @@
 package org.cuttlefish.pipelining
 
-import org.cuttlefish.Parser.toRegister
 import org.cuttlefish.data.Register
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
@@ -143,3 +142,6 @@ fun main() {
 /** Debugging */
 @Suppress("unused")
 fun UShort.bin() = this.toString(2).padStart(16, '0')
+fun String.toRegister(): Register {
+    return Register.valueOf(this.uppercase())
+}
