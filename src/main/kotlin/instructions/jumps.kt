@@ -6,19 +6,19 @@ import org.cuttlefish.data.RegisterValue
 
 fun Instruction.j(line: UShort) {
     useful
-    Register.PC.writeToPc(line)
+    Register.PC.writePrivilege(line)
 }
 
 fun Instruction.jnz(line: UShort, register: RegisterValue) {
     useful
     if (register.value != 0.toShort()) {
-        Register.PC.writeToPc(line)
+        Register.PC.writePrivilege(line)
     }
 }
 
 fun Instruction.jz(line: UShort, register: RegisterValue) {
     useful
     if (register.value == 0.toShort()) {
-        Register.PC.writeToPc(line)
+        Register.PC.writePrivilege(line)
     }
 }

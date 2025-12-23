@@ -12,19 +12,19 @@ class IF {
     private val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
 
     fun fetch(): List<UShort?> {
-        val pc = Register.PC.readToPc()
+        val pc = Register.PC.readPrivilege()
         val full1 = Memory.read(pc.toShort()).toUShort()
 
         val opcode = full1.toInt() shr (16 - 5)
         val type = opcodeMap[opcode]
 
-        Register.PC.writeToPc((pc + 1u).toUShort())
+        Register.PC.writePrivilege((pc + 1u).toUShort())
 
         var full2: UShort? = null
         if (type == InstructionType.Immediates || type == InstructionType.RegisterImmediates) {
-            val nextPc = Register.PC.readToPc()
+            val nextPc = Register.PC.readPrivilege()
             full2 = Memory.read(nextPc.toShort()).toUShort()
-            Register.PC.writeToPc((nextPc + 1u).toUShort())
+            Register.PC.writePrivilege((nextPc + 1u).toUShort())
         }
 
         return listOf(full1, full2)

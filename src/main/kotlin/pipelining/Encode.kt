@@ -123,19 +123,19 @@ fun main() {
     }
 
     val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
-    while (Register.PC.readToPc().toInt() < index) {
-        val full1 = memory[Register.PC.readToPc().toInt()].toUShort()
+    while (Register.PC.readPrivilege().toInt() < index) {
+        val full1 = memory[Register.PC.readPrivilege().toInt()].toUShort()
         val opcode = full1.toInt() shr (16 - 5)
         val type = opcodeMap[opcode]
         val full2: UShort?
         if (type == InstructionType.Immediates || type == InstructionType.RegisterImmediates) {
-            Register.PC.writeToPc((Register.PC.readToPc() + 1u).toUShort())
-            full2 = memory[Register.PC.readToPc().toInt()].toUShort()
+            Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
+            full2 = memory[Register.PC.readPrivilege().toInt()].toUShort()
         } else {
             full2 = null
         }
         println(ID(full1, full2).fmt())
-        Register.PC.writeToPc((Register.PC.readToPc() + 1u).toUShort())
+        Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
     }
 }
 

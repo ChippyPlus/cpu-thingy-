@@ -1,29 +1,30 @@
 package org.cuttlefish.data
 
 enum class Register {
-    R1, R2, R3, R4, PC, R6, R7, R8;
+    R1, R2, R3, R4, PC, INSTR;
 
     private var data: Short = 0
-    private var dataIfPc: UShort = 0u
+    private var dataSpecial: UShort = 0u
     fun read(): Short = data
     fun write(data: Short) {
         if (this == PC) throw IllegalStateException("Writing to PC is not allowed!!!!")
         this.data = data
     }
 
-    fun readToPc(): UShort = dataIfPc
-    fun writeToPc(data: UShort) {
-        if (this == PC) this.dataIfPc = data
-        else throw IllegalStateException("This is only for the PC!!!!!")
+    fun readPrivilege(): UShort {
+        if (this == PC || this == INSTR) return dataSpecial
+        else throw IllegalStateException("This is only for the PRIVILEGED REGISTERS!!!!!")
+    }
+
+    fun writePrivilege(data: UShort) {
+        if (this == PC || this == INSTR) dataSpecial = data
+        else throw IllegalStateException("This is only for the PRIVILEGED REGISTERS!!!!!")
     }
 
 }
 
 @JvmInline
 value class RegisterValue(val value: Short)
-
-@JvmInline
-value class MemoryValue(val value: Short)
 
 @JvmInline
 value class RegisterAddress(val value: Register)

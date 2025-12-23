@@ -21,7 +21,7 @@ fun main() {
     }
     // shh! this is encoding
 
-    while (Register.PC.readToPc().toInt() < index) {
+    while (Register.PC.readPrivilege().toInt() < index) {
         val instructionFetch: List<UShort?> = IF().fetch()
         val instructionDecode = ID(full1 = instructionFetch[0]!!, full2 = instructionFetch[1])
         println(instructionDecode.fmt())
