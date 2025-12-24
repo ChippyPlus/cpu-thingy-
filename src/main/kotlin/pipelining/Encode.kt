@@ -108,6 +108,9 @@ class Encode(val instructStr: String) {
 
 }
 
+val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
+val opcodeMapFullMeta = mappings.entries.associate { (it.value[1] as Number).toInt() to listOf(it.key, it.value) }
+
 
 fun main() {
     val memory = ShortArray(64) { 0 }
@@ -122,7 +125,6 @@ fun main() {
         }
     }
 
-    val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
     while (Register.PC.readPrivilege().toInt() < index) {
         val full1 = memory[Register.PC.readPrivilege().toInt()].toUShort()
         val opcode = full1.toInt() shr (16 - 5)

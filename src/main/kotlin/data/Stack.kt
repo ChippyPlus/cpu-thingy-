@@ -9,8 +9,8 @@ object Stack {
     }
 
     fun pop(): Short {
-        val dataToUse: Short = dataStructure[sp.toInt()]
         sp = (sp - 1).toShort()
+        val dataToUse: Short = dataStructure[sp.toInt()]
         return dataToUse
     }
 

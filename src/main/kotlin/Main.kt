@@ -6,6 +6,8 @@ import org.cuttlefish.pipelining.EX
 import org.cuttlefish.pipelining.Encode
 import org.cuttlefish.pipelining.ID
 import org.cuttlefish.pipelining.IF
+import org.cuttlefish.pipelining.MEM
+import org.cuttlefish.pipelining.WB
 import java.io.File
 
 fun main() {
@@ -26,6 +28,8 @@ fun main() {
         val instructionFetch: List<UShort?> = IF().fetch()
         val instructionDecode = ID(full1 = instructionFetch[0]!!, full2 = instructionFetch[1])
         val execute = EX(instructionDecode)
-        println(execute)
+        val mem = MEM(execute)
+        val wb = WB(execute)
+//        println(execute)
     }
 }
