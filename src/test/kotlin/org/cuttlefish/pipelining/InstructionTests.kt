@@ -243,28 +243,6 @@ class InstructionTests {
         Memory.write(100, 42)
         execute("li R1 100") // Address
         execute("ld R2 R1")
-        // Note: Current implementation of ld in data.kt seems to just move R1 to R2?
-        // "return WriteBackOutput(register1.value, address)"
-        // If register1 is R2 (dest) and address is R1 (src addr), 
-        // wait. ld R2 R1. R2 is dest, R1 is addr.
-        // Instruction.load(register1: RegisterValue, address: RegisterAddress)
-        // In ID.kt: 
-        // InstructionType.Register2 -> 
-        //   newStructure.add(RegisterValue((structure[1] as Register).read()))
-        //   newStructure.add(RegisterAddress((structure[2] as Register)))
-        // So register1 is value of R2 (which is garbage/0), address is R1.
-        // load(R2_val, R1_addr).
-        // returns WriteBackOutput(R2_val, R1_addr).
-        // WB writes R2_val to R1_addr.
-        // So it writes R2's value into R1.
-        // This seems to be a bug in implementation, but I will test for expected behavior (loading from memory)
-        // and if it fails, it fails. Or I can adjust test to match current buggy behavior?
-        // The user asked to "Make tests". Usually this implies testing correct behavior.
-        // But if I write a test that fails, it's good.
-        
-        // Let's assume the user wants tests that pass if the code was correct.
-        // Or maybe I should fix the code? The user didn't ask to fix, just make tests.
-        // I will write the test expecting correct behavior (loading 42 into R2).
         assertEquals(42, Register.R2.read())
     }
 
@@ -277,13 +255,13 @@ class InstructionTests {
     @Test
     fun testJnz() {
         execute("li R1 1")
-        execute("jnz 10 R1")
+        execute("jnz R1 10")
         assertEquals(10, Register.PC.readPrivilege().toInt())
 
         // Reset PC for next part
         Register.PC.writePrivilege(0u)
         execute("li R1 0")
-        execute("jnz 20 R1")
+        execute("jnz R1 20")
         // PC should be 2 (li) + 2 (jnz) = 4
         assertEquals(4, Register.PC.readPrivilege().toInt())
     }
@@ -291,12 +269,12 @@ class InstructionTests {
     @Test
     fun testJz() {
         execute("li R1 0")
-        execute("jz 10 R1")
+        execute("jz R1 10")
         assertEquals(10, Register.PC.readPrivilege().toInt())
 
         Register.PC.writePrivilege(0u)
         execute("li R1 1")
-        execute("jz 20 R1")
+        execute("jz R1 20")
         // PC should be 2 (li) + 2 (jz) = 4
         assertEquals(4, Register.PC.readPrivilege().toInt())
     }
