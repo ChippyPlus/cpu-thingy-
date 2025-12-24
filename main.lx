@@ -18,7 +18,6 @@ not r1 r2
 add r1 r2 r3
 sub r1 r2 r3
 mul r1 r2 r3
-div r1 r2 r3
 mov r1 r2
 li r1 10
 pr r1

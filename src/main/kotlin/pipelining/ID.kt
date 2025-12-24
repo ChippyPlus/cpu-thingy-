@@ -8,7 +8,7 @@ import org.cuttlefish.instructions.InstructionType
 
 
 /**
- * 2. Decode instruction and read registers
+ * 2 Decode instruction and read registers
  */
 class ID(val full1: UShort, val full2: UShort? = null) {
     val name = name()
@@ -119,11 +119,15 @@ class ID(val full1: UShort, val full2: UShort? = null) {
 
             InstructionType.Register2 -> {
                 newStructure.add(RegisterValue((structure[1] as Register).read()))
-                newStructure.add(RegisterAddress((structure[2] as Register)))
+                if (name == "st") {
+                    newStructure.add(RegisterValue((structure[2] as Register).read()))
+                } else {
+                    newStructure.add(RegisterAddress((structure[2] as Register)))
+                }
             }
 
             InstructionType.Immediates -> {
-                newStructure.add(RegisterValue((structure[1] as Short)))
+                newStructure.add((structure[1] as UShort))
             }
 
             InstructionType.StandAlone -> {

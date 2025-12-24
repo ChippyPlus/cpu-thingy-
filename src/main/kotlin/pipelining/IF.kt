@@ -6,7 +6,7 @@ import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
 
 /**
- * 1. Fetch instruction from memory
+ * 1 Fetch instruction from memory
  */
 class IF {
     private val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }

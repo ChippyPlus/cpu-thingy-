@@ -7,7 +7,7 @@ import org.cuttlefish.instructions.InstructionType
 
 
 /**
- * 3. Execute the operation or calculate address
+ * 3 Execute the operation or calculate address
  */
 class EX(decoded: ID) {
     val name = decoded.name
@@ -37,15 +37,23 @@ class EX(decoded: ID) {
             }
 
             InstructionType.Register2 -> {
-                @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> Unit).invoke(
-                    fmtStructure[1] as RegisterValue,
-                    fmtStructure[2] as RegisterAddress,
-                )
+
+                if (name == "st") {
+                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> Unit).invoke(
+                        fmtStructure[1] as RegisterValue,
+                        fmtStructure[2] as RegisterValue,
+                    )
+                } else {
+                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> Unit).invoke(
+                        fmtStructure[1] as RegisterValue,
+                        fmtStructure[2] as RegisterAddress,
+                    )
+                }
             }
 
             InstructionType.Immediates -> {
                 @Suppress("UNCHECKED_CAST") (kFunctionExe as (UShort) -> Unit).invoke(
-                    fmtStructure[1] as UShort
+                    (fmtStructure[1] as UShort)
                 )
             }
 
