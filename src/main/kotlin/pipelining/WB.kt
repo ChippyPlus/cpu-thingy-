@@ -4,9 +4,8 @@ package org.cuttlefish.pipelining
 /**
  * 5 Write the result into a register
  */
-class WB(ex: EX) {
+class WB(ex: EX,memoryPipeline: MEM) {
     val result = ex.result
-
     init {
         when (result) {
             EXResult.Empty -> {}

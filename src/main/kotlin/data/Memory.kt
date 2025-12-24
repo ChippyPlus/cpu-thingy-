@@ -18,10 +18,7 @@ object Memory {
     }
 
     private fun validAddress(address: Short): Boolean {
-        if (address !in 0..<SIZE) {
-            return false
-        }
-        return true
+        return address in 0..<SIZE
     }
 
 }

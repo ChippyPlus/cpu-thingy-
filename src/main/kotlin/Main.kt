@@ -29,7 +29,7 @@ fun main() {
         val instructionDecode = ID(full1 = instructionFetch[0]!!, full2 = instructionFetch[1])
         val execute = EX(instructionDecode)
         val mem = MEM(execute)
-        val wb = WB(execute)
+        val wb = WB(execute,mem)
 //        println(execute)
     }
 }

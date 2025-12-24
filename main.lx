@@ -1,5 +1,5 @@
 li r1 20
-li r2 0
+li r2 10
 st r1 r2
 ld r3 r2
 pr r3
