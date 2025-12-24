@@ -33,4 +33,4 @@ value class RegisterAddress(val value: Register)
 value class MemoryAddress(val value: Short)
 
 data class WriteBackOutput(val value: Short, val location: RegisterAddress)
-data class MEMWruteBackOutput(val value: Short, val location: MemoryAddress)
+data class MEMWruteBackOutput( val value: Short,  val location: MemoryAddress)

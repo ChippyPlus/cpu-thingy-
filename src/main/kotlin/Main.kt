@@ -26,5 +26,6 @@ fun main() {
         val instructionFetch: List<UShort?> = IF().fetch()
         val instructionDecode = ID(full1 = instructionFetch[0]!!, full2 = instructionFetch[1])
         val execute = EX(instructionDecode)
+        println(execute)
     }
 }
