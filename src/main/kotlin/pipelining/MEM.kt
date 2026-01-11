@@ -28,7 +28,6 @@ class MEM(ex: EX) {
                     val value = ex.result.value.value
                     val memEX = Memory.read(value)
                     val wb = WriteBackOutput(memEX, ex.result.value.location)
-
                 }
             }
 
