@@ -1,9 +1,6 @@
 package org.cuttlefish.pipelining
 
-import org.cuttlefish.data.MEMWruteBackOutput
-import org.cuttlefish.data.RegisterAddress
-import org.cuttlefish.data.RegisterValue
-import org.cuttlefish.data.WriteBackOutput
+import org.cuttlefish.data.*
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
 
@@ -17,81 +14,101 @@ sealed interface EXResult {
 /**
  * 3 Execute the operation or calculate address
  */
-class EX(decoded: ID) {
-    val name = decoded.name
-    val fmt = decoded.fmt
-    val kFunctionExe = mappings[name]!![0]
-    val fmtStructure = decoded.fillInRegisters()
-    val result: EXResult = when (fmt) {
-        InstructionType.Register1 -> {
+class EX {
+    fun execute() {
+        val decoded = PipeBuffer.pid!!
+        val name = decoded.name
+        val fmt = decoded.fmt
+        val kFunctionExe = mappings[name]!![0]
+        val fmtStructure = decoded.fillInRegisters()
+        val result: EXResult = when (fmt) {
+            InstructionType.Register1 -> {
 
-            if (name == "pop") {
-                val res =
-                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress) -> WriteBackOutput).invoke(fmtStructure[1] as RegisterAddress)
-                EXResult.Register(res)
-            } else {
-                @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
-                EXResult.Empty
+                if (name == "pop") {
+                    val res =
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress) -> WriteBackOutput).invoke(
+                            fmtStructure[1] as RegisterAddress
+                        )
+                    EXResult.Register(res)
+                } else {
+                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
+                    EXResult.Empty
+                }
             }
-        }
 
 
-        InstructionType.Register3 -> {
-            val res =
-                @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
-                    fmtStructure[1] as RegisterValue,
-                    fmtStructure[2] as RegisterValue,
-                    fmtStructure[3] as RegisterAddress,
-                )
-            EXResult.Register(res)
-        }
-
-        InstructionType.Register2 -> {
-
-            if (name == "st") {
+            InstructionType.Register3 -> {
                 val res =
-                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput).invoke(
+                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
                         fmtStructure[1] as RegisterValue,
                         fmtStructure[2] as RegisterValue,
-                    )
-                EXResult.Memory(res)
-            } else {
-                val res =
-                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
-                        fmtStructure[1] as RegisterValue,
-                        fmtStructure[2] as RegisterAddress,
+                        fmtStructure[3] as RegisterAddress,
                     )
                 EXResult.Register(res)
             }
-        }
 
-        InstructionType.Immediates -> {
-            val res = @Suppress("UNCHECKED_CAST") (kFunctionExe as (UShort) -> Unit).invoke(
-                (fmtStructure[1] as UShort)
-            )
-            EXResult.Empty
-        }
+            InstructionType.Register2 -> {
 
-        InstructionType.StandAlone -> {
-            EXResult.Empty
-        }
+                if (name == "st") {
+                    val res =
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput).invoke(
+                            fmtStructure[1] as RegisterValue,
+                            fmtStructure[2] as RegisterValue,
+                        )
+                    EXResult.Memory(res)
+                } else {
+                    val res =
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
+                            fmtStructure[1] as RegisterValue,
+                            fmtStructure[2] as RegisterAddress,
+                        )
+                    EXResult.Register(res)
+                }
+            }
 
-        InstructionType.RegisterImmediates -> {
-
-
-            if (name == "li") { // RegisterADDRESS
-                val res =
-                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress, Short) -> WriteBackOutput).invoke(
-                        fmtStructure[1] as RegisterAddress, (fmtStructure[2] as Short)
-                    )
-                EXResult.Register(res)
-            } else {
-                @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, Short) -> Unit).invoke(
-                    fmtStructure[1] as RegisterValue, (fmtStructure[2] as Short)
+            InstructionType.Immediates -> {
+                val res = @Suppress("UNCHECKED_CAST") (kFunctionExe as (UShort) -> Unit).invoke(
+                    (fmtStructure[1] as UShort)
                 )
                 EXResult.Empty
             }
+
+            InstructionType.StandAlone -> {
+                EXResult.Empty
+            }
+
+            InstructionType.RegisterImmediates -> {
+
+
+                if (name == "li") { // RegisterADDRESS
+                    val res =
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress, Short) -> WriteBackOutput).invoke(
+                            fmtStructure[1] as RegisterAddress, (fmtStructure[2] as Short)
+                        )
+                    EXResult.Register(res)
+                } else {
+                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, Short) -> Unit).invoke(
+                        fmtStructure[1] as RegisterValue, (fmtStructure[2] as Short)
+                    )
+                    EXResult.Empty
+                }
+            }
         }
+
+        when (result) {
+            is EXResult.Register -> {
+                PipeBuffer.pwb = result.value
+                val x = result.value
+            }
+
+            is EXResult.Memory -> {
+                PipeBuffer.pmem = result.value
+            }
+
+            is EXResult.Empty -> {}
+        }
+
     }
+
 
 }

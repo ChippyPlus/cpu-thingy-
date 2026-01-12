@@ -1,20 +1,18 @@
 package org.cuttlefish.pipelining
 
+import org.cuttlefish.data.PipeBuffer
+
 
 /**
  * 5 Write the result into a register
  */
-class WB(ex: EX,memoryPipeline: MEM) {
-    val result = ex.result
-    init {
-        when (result) {
-            EXResult.Empty -> {}
-            is EXResult.Memory -> {}
-            is EXResult.Register -> {
-                val value = this.result.value.value
-                val location = this.result.value.location.value
-                location.write(value)
-            }
+class WB {
+
+    fun writeBack() {
+        if (PipeBuffer.pwb != null) {
+            val value = PipeBuffer.pwb!!.value
+            val location = PipeBuffer.pwb!!.location.value
+            location.write(value)
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.cuttlefish.pipelining
 
 import org.cuttlefish.data.Memory
+import org.cuttlefish.data.PipeBuffer
 import org.cuttlefish.data.Register
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
@@ -11,7 +12,7 @@ import org.cuttlefish.instructions.InstructionType
 class IF {
     private val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
 
-    fun fetch(): List<UShort?> {
+    private fun insideFetch(): List<UShort?> {
         val pc = Register.PC.readPrivilege()
         val full1 = Memory.read(pc.toShort()).toUShort()
 
@@ -30,5 +31,9 @@ class IF {
         }
 
         return listOf(full1, full2)
+    }
+
+    fun fetch() {
+        PipeBuffer.pif = insideFetch()
     }
 }
