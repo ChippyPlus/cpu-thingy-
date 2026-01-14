@@ -57,7 +57,16 @@ class EX {
                             fmtStructure[2] as RegisterValue,
                         )
                     EXResult.Memory(res)
-                } else {
+                }
+//                else if (name == "ld") {
+//                    val res =
+//                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput).invoke(
+//                            fmtStructure[1] as RegisterValue,
+//                            fmtStructure[2] as RegisterValue,
+//                        )
+//                    EXResult.Memory(res)
+//                }
+                else {
                     val res =
                         @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
                             fmtStructure[1] as RegisterValue,

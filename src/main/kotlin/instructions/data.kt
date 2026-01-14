@@ -42,5 +42,5 @@ fun Instruction.store(register1: RegisterValue, address: RegisterValue): MEMWrut
 //    val memoryIn = register1.read()
 //    val address = address.read()
 //    Memory.write(address, memoryIn)
-    return MEMWruteBackOutput(register1.value, MemoryAddress(address.value))
+    return MEMWruteBackOutput(register1.value, MemoryAddress(address.value), null)
 }

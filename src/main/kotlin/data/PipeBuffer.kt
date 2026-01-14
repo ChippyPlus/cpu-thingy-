@@ -10,6 +10,6 @@ object PipeBuffer {
     var pwb: WriteBackOutput? = null
 
     override fun toString(): String {
-        return "FETCH=${pif}\nDECODE=$pid\nEXECUTE=$pex\nMEMORY=$pmem\nWRITE=$pwb"
+        return "-------------\nFETCH=${pif}\nDECODE=$pid\nEXECUTE=$pex\nMEMORY=$pmem\nWRITE=$pwb\n-------------\n"
     }
 }
