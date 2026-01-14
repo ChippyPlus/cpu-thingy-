@@ -159,7 +159,7 @@ class ID {
         println("decoding")
         PipeBuffer.pid = DecodeInstruction(
             full1 = PipeBuffer.pif!![0]!!,
-            full2 = PipeBuffer.pif!![1]!!,
+            full2 = PipeBuffer.pif!![1],
             name = name,
             format = fmt,
             structure = fmtStructure(),
