@@ -1,7 +1,6 @@
 package org.cuttlefish.data
 
 import org.cuttlefish.pipelining.EXResult
-import org.cuttlefish.pipelining.ID
 
 object PipeBuffer {
     var pif: List<UShort?>? = null
@@ -9,4 +8,8 @@ object PipeBuffer {
     var pex: EXResult? = null
     var pmem: MEMWruteBackOutput? = null
     var pwb: WriteBackOutput? = null
+
+    override fun toString(): String {
+        return "FETCH=${pif}\nDECODE=$pid\nEXECUTE=$pex\nMEMORY=$pmem\nWRITE=$pwb"
+    }
 }

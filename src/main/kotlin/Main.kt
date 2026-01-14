@@ -22,8 +22,7 @@ fun main() {
 
     while (Register.PC.readPrivilege().toInt() < index) {
         IF().fetch()
-        println(PipeBuffer.pif)
-        println(PipeBuffer.pid)
+        println(PipeBuffer)
         ID().decode()
         EX().execute()
         MEM().memoryWriteBack()
