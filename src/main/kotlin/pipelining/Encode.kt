@@ -111,35 +111,35 @@ class Encode(val instructStr: String) {
 val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
 val opcodeMapFullMeta = mappings.entries.associate { (it.value[1] as Number).toInt() to listOf(it.key, it.value) }
 
-
-fun main() {
-    val memory = ShortArray(64) { 0 }
-    var index = 0
-    for (line in File("main.lx").readLines()) {
-        val encode = Encode(line)
-        memory[index] = encode.full.toShort()
-        index++
-        if (encode.full2 != null) {
-            memory[index] = encode.full2!!.toShort()
-            index++
-        }
-    }
-
-    while (Register.PC.readPrivilege().toInt() < index) {
-        val full1 = memory[Register.PC.readPrivilege().toInt()].toUShort()
-        val opcode = full1.toInt() shr (16 - 5)
-        val type = opcodeMap[opcode]
-        val full2: UShort?
-        if (type == InstructionType.Immediates || type == InstructionType.RegisterImmediates) {
-            Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
-            full2 = memory[Register.PC.readPrivilege().toInt()].toUShort()
-        } else {
-            full2 = null
-        }
-        println(ID(full1, full2).fmtStructure())
-        Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
-    }
-}
+//
+//fun main() {
+//    val memory = ShortArray(64) { 0 }
+//    var index = 0
+//    for (line in File("main.lx").readLines()) {
+//        val encode = Encode(line)
+//        memory[index] = encode.full.toShort()
+//        index++
+//        if (encode.full2 != null) {
+//            memory[index] = encode.full2!!.toShort()
+//            index++
+//        }
+//    }
+//
+//    while (Register.PC.readPrivilege().toInt() < index) {
+//        val full1 = memory[Register.PC.readPrivilege().toInt()].toUShort()
+//        val opcode = full1.toInt() shr (16 - 5)
+//        val type = opcodeMap[opcode]
+//        val full2: UShort?
+//        if (type == InstructionType.Immediates || type == InstructionType.RegisterImmediates) {
+//            Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
+//            full2 = memory[Register.PC.readPrivilege().toInt()].toUShort()
+//        } else {
+//            full2 = null
+//        }
+//        println(ID().fmtStructure())
+//        Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
+//    }
+//}
 
 /** Debugging */
 @Suppress("unused")

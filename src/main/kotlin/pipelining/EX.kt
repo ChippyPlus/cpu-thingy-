@@ -19,9 +19,9 @@ class EX {
         println("executing")
         val decoded = PipeBuffer.pid!!
         val name = decoded.name
-        val fmt = decoded.fmt
+        val fmt = decoded.format
         val kFunctionExe = mappings[name]!![0]
-        val fmtStructure = decoded.fillInRegisters()
+        val fmtStructure = decoded.registerStructure
         val result: EXResult = when (fmt) {
             InstructionType.Register1 -> {
 
@@ -68,7 +68,7 @@ class EX {
             }
 
             InstructionType.Immediates -> {
-                val res = @Suppress("UNCHECKED_CAST") (kFunctionExe as (UShort) -> Unit).invoke(
+                @Suppress("UNCHECKED_CAST") (kFunctionExe as (UShort) -> Unit).invoke(
                     (fmtStructure[1] as UShort)
                 )
                 EXResult.Empty
@@ -99,7 +99,6 @@ class EX {
         when (result) {
             is EXResult.Register -> {
                 PipeBuffer.pwb = result.value
-                val x = result.value
             }
 
             is EXResult.Memory -> {

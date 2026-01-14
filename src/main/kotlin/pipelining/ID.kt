@@ -157,7 +157,14 @@ class ID {
 
     fun decode() {
         println("decoding")
-        PipeBuffer.pid = DecodeInstruction(full1 = PipeBuffer.pif!![0]!!, full2 = PipeBuffer.pif!![1]!!)
+        PipeBuffer.pid = DecodeInstruction(
+            full1 = PipeBuffer.pif!![0]!!,
+            full2 = PipeBuffer.pif!![1]!!,
+            name = name,
+            format = fmt,
+            structure = fmtStructure(),
+            registerStructure = fillInRegisters()
+        )
     }
 
 }

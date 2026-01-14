@@ -24,12 +24,11 @@ fun main() {
         IF().fetch()
         println(PipeBuffer.pif)
         println(PipeBuffer.pid)
-
-        ID(pipelined = true).decode()
+        ID().decode()
         EX().execute()
         MEM().memoryWriteBack()
         WB().writeBack()
 
-    //        println(execute)
+        //        println(execute)
     }
 }

@@ -15,7 +15,7 @@ class MEM() {
         when (val ex = PipeBuffer.pex!!) {
             EXResult.Empty -> {}
             is EXResult.Register -> {
-                if ("ld" == ID((Register.INSTR.readPrivilege())).name) {
+                if ("ld" == ID().name) {
                     val value = ex.value.value
                     val memEX = Memory.read(value)
                     PipeBuffer.pwb = WriteBackOutput(memEX, ex.value.location)
@@ -23,7 +23,7 @@ class MEM() {
             }
 
             is EXResult.Memory -> {
-                if ("st" == ID((Register.INSTR.readPrivilege())).name) {
+                if ("st" == ID().name) {
                     val location = ex.value.location.value
                     val value = ex.value.value
                     Memory.write(location, value)

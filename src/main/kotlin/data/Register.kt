@@ -1,5 +1,8 @@
 package org.cuttlefish.data
 
+import org.cuttlefish.instructions.Instruction
+import org.cuttlefish.instructions.InstructionType
+
 enum class Register {
     R1, R2, R3, R4, PC, INSTR;
 
@@ -33,6 +36,14 @@ value class RegisterAddress(val value: Register)
 value class MemoryAddress(val value: Short)
 
 
-data class DecodeInstruction(val full1: UShort, val full2: UShort?)
+data class DecodeInstruction(
+    val full1: UShort,
+    val full2: UShort?,
+    val name: String,
+    val format: InstructionType,
+    val structure: List<Any>,
+    val registerStructure: List<Any>,
+)
+
 data class WriteBackOutput(val value: Short, val location: RegisterAddress)
 data class MEMWruteBackOutput(val value: Short, val location: MemoryAddress)
