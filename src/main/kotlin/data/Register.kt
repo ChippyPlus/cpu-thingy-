@@ -32,5 +32,7 @@ value class RegisterAddress(val value: Register)
 @JvmInline
 value class MemoryAddress(val value: Short)
 
+
+data class DecodeInstruction(val full1: UShort, val full2: UShort?)
 data class WriteBackOutput(val value: Short, val location: RegisterAddress)
-data class MEMWruteBackOutput( val value: Short,  val location: MemoryAddress)
+data class MEMWruteBackOutput(val value: Short, val location: MemoryAddress)

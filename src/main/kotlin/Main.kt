@@ -1,6 +1,7 @@
 package org.cuttlefish
 
 import org.cuttlefish.data.Memory
+import org.cuttlefish.data.PipeBuffer
 import org.cuttlefish.data.Register
 import org.cuttlefish.pipelining.*
 import java.io.File
@@ -21,10 +22,14 @@ fun main() {
 
     while (Register.PC.readPrivilege().toInt() < index) {
         IF().fetch()
+        println(PipeBuffer.pif)
+        println(PipeBuffer.pid)
+
         ID(pipelined = true).decode()
         EX().execute()
         MEM().memoryWriteBack()
         WB().writeBack()
-//        println(execute)
+
+    //        println(execute)
     }
 }

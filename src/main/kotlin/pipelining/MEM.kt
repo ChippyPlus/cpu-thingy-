@@ -11,6 +11,7 @@ import org.cuttlefish.data.WriteBackOutput
  */
 class MEM() {
     fun memoryWriteBack() {
+        println("memory writing backing")
         when (val ex = PipeBuffer.pex!!) {
             EXResult.Empty -> {}
             is EXResult.Register -> {

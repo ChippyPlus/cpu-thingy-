@@ -16,6 +16,7 @@ sealed interface EXResult {
  */
 class EX {
     fun execute() {
+        println("executing")
         val decoded = PipeBuffer.pid!!
         val name = decoded.name
         val fmt = decoded.fmt
