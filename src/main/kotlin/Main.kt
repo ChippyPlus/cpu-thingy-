@@ -1,9 +1,8 @@
 package org.cuttlefish
 
 import org.cuttlefish.data.Memory
-import org.cuttlefish.data.PipeBuffer
 import org.cuttlefish.data.Register
-import org.cuttlefish.pipelining.*
+import org.cuttlefish.pipelining.Encode
 import java.io.File
 
 fun main() {
@@ -21,20 +20,6 @@ fun main() {
     // shh! this is encoding
 
     while (Register.PC.readPrivilege().toInt() < index) {
-        IF().fetch()
-        println(PipeBuffer)
-        ID().decode()
-        println(PipeBuffer)
 
-        EX().execute()
-        println(PipeBuffer)
-
-        MEM().memoryWriteBack()
-        println(PipeBuffer)
-
-        WB().writeBack()
-        println(PipeBuffer)
-
-        //        println(execute)
     }
 }

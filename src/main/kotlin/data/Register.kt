@@ -22,31 +22,4 @@ enum class Register {
         if (this == PC || this == INSTR) dataSpecial = data
         else throw IllegalStateException("This is only for the PRIVILEGED REGISTERS!!!!!")
     }
-
 }
-
-@JvmInline
-value class RegisterValue(val value: Short)
-
-@JvmInline
-value class RegisterAddress(val value: Register)
-
-@JvmInline
-value class MemoryAddress(val value: Short)
-
-
-data class DecodeInstruction(
-    val full1: UShort,
-    val full2: UShort?,
-    val name: String,
-    val format: InstructionType,
-    val structure: List<Any>,
-    val registerStructure: List<Any>,
-)
-
-data class WriteBackOutput(val value: Short, val location: RegisterAddress)
-data class MEMWruteBackOutput(
-    val value: Short,
-    val location: MemoryAddress,
-    val optionalRegisterLocation: RegisterAddress?
-)
