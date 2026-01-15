@@ -1,5 +1,6 @@
 package org.cuttlefish.pipelining
 
+import org.cuttlefish.Encode
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.Register
 import org.cuttlefish.data.Stack

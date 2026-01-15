@@ -2,7 +2,6 @@ package org.cuttlefish
 
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.Register
-import org.cuttlefish.pipelining.Encode
 import java.io.File
 
 fun main() {

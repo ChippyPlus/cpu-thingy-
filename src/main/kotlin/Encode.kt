@@ -1,9 +1,8 @@
-package org.cuttlefish.pipelining
+package org.cuttlefish
 
 import org.cuttlefish.data.Register
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
-import java.io.File
 
 class Encode(val instructStr: String) {
     val name = instructStr.split(" ")[0]
