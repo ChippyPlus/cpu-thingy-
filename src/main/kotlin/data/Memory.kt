@@ -17,7 +17,7 @@ object Memory {
         delay(Clock.SPEED_MEMORY_READ)
 
         if (!validAddress(address)) {
-            return -1 // Would've thrown an exception!!
+            return -1 // Would've thrown an exception!! What a waste! You should know better 🙄
         }
         return memory[address.toInt()]
     }
