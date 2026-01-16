@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 
 object Memory {
     const val SIZE = 256
-    private val memory = ShortArray(SIZE) { -1 }
+    val memory = ShortArray(SIZE) { -1 }
     suspend fun write(address: Short, value: Short) {
         delay(Clock.SPEED_MEMORY_WRITE)
         if (validAddress(address)) {
