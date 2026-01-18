@@ -8,7 +8,6 @@ import org.cuttlefish.instructions.InstructionType
 
 class Decode {
 
-    val pc = Register.PC.read()
     var instr = Register.INSTR.read().toUShort()
 
 
