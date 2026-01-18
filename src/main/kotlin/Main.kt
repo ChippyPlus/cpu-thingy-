@@ -1,7 +1,6 @@
 package org.cuttlefish
 
 import org.cuttlefish.data.Memory
-import org.cuttlefish.data.Register
 import java.io.File
 
 suspend fun main() {
@@ -18,11 +17,17 @@ suspend fun main() {
         }
     }
 
-    println(Memory.memory.toList().subList(0,10))
-    for (i in 0..6) {
+    println(Memory.memory.toList().subList(0, 10))
+    @Suppress("EmptyRange") for (i in 0..<index) { // it's NOT EMPTY SO SHUT THE FUCK UP!
         println(Memory.read(i.toShort()))
+        println(
+            message = Decode(full1 = with(Memory) { read(i.toShort()).toUShort() }, full2 = with(Memory) {
+                read(
+                    ((i.toShort() + (if (i != 10 - 1) 0 else 1).toShort()).toShort())
+                ).toUShort()
+            }).decode()
+        )
     }
-
-    // shh! this is encoding
+// shh! this is encoding
 
 }
