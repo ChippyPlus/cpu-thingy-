@@ -17,9 +17,12 @@ fun main() {
             index++
         }
     }
-    // shh! this is encoding
 
-    while (Register.PC.readPrivilege().toInt() < index) {
+    while (Register.PC.read().toInt() < index) {
+        Register.INSTR.write(Memory.read(Register.PC.read()))
+        println(Register.INSTR.read())
 
+
+        Register.PC.write((Register.PC.read() + 1).toShort())
     }
 }
