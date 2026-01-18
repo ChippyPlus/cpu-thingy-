@@ -1,7 +1,9 @@
 package org.cuttlefish
 
+import kotlinx.serialization.encoding.Decoder
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.Register
+import org.cuttlefish.pipelining.Decode
 import org.cuttlefish.pipelining.Encode
 import java.io.File
 
@@ -21,7 +23,7 @@ fun main() {
     while (Register.PC.read().toInt() < index) {
         Register.INSTR.write(Memory.read(Register.PC.read()))
         println(Register.INSTR.read())
-
+        println(Decode().decode())
 
         Register.PC.write((Register.PC.read() + 1).toShort())
     }
