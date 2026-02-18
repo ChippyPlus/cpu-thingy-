@@ -42,17 +42,17 @@ object Alu {
 
     suspend inline fun alu_sub(a: Short, b: Short): Short {
         delay(Clock.SPEED_ALU)
-        return (a + b).toShort()
+        return (a - b).toShort()
     }
 
     suspend inline fun alu_mul(a: Short, b: Short): Short {
         delay(Clock.SPEED_ALU)
-        return (a + b).toShort()
+        return (a * b).toShort()
     }
 
     suspend inline fun alu_div(a: Short, b: Short): Short {
         delay(Clock.SPEED_ALU)
-        return (a + b).toShort()
+        return (a / b).toShort()
     }
 
     suspend inline fun alu_eq(a: Short, b: Short): Short {

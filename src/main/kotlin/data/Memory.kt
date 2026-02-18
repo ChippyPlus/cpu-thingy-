@@ -17,8 +17,9 @@ object Memory {
         delay(Clock.SPEED_MEMORY_READ)
 
         if (!validAddress(address)) {
-            return -1 // Would've thrown an exception!! What a waste! You should know better 🙄
+            throw IllegalStateException("Address $address is out of bounds (0..${SIZE - 1})")
         }
+
         return memory[address.toInt()]
     }
 

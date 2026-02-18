@@ -50,21 +50,21 @@ class EX {
             InstructionType.Register2 -> {
 
                 if (name == "st") {
-                    val res =
+                    val res: MEMWruteBackOutput =
                         @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput).invoke(
                             fmtStructure[1] as RegisterValue,
                             fmtStructure[2] as RegisterValue,
                         )
-                    EXResult.Memory(res, fmtStructure)
+                    EXResult.Memory(returns = res, arguments = fmtStructure)
                 } else if (name == "ld") {
-                    val res =
+                    val res: MEMWruteBackOutput =
                         @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> MEMWruteBackOutput).invoke(
                             fmtStructure[1] as RegisterValue,
                             fmtStructure[2] as RegisterAddress,
                         )
-                    EXResult.Memory(res, fmtStructure)
+                    EXResult.Memory(returns = res, arguments = fmtStructure)
                 } else {
-                    val res =
+                    val res: WriteBackOutput =
                         @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
                             fmtStructure[1] as RegisterValue,
                             fmtStructure[2] as RegisterAddress,
