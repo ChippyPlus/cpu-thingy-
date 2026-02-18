@@ -102,7 +102,7 @@ class ID {
         }
     }
 
-    fun fillInRegisters(): List<Any> {
+    suspend fun fillInRegisters(): List<Any> {
         val structure = fmtStructure()
         val newStructure = mutableListOf<Any>()
         newStructure.add(structure[0])
@@ -155,7 +155,7 @@ class ID {
 
     }
 
-    fun decode() {
+    suspend fun decode() {
 //        println("decoding")
         PipeBuffer.pid = DecodeInstruction(
             full1 = PipeBuffer.pif!![0]!!,

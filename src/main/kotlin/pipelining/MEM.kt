@@ -10,7 +10,7 @@ import org.cuttlefish.data.WriteBackOutput
  */
 class MEM {
 
-    fun memoryWriteBack() {
+    suspend fun memoryWriteBack() {
         val input = PipeBuffer.pmem ?: return
 
         //  NO FUCKING TIME TRAVEL

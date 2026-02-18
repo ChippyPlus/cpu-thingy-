@@ -12,7 +12,7 @@ import org.cuttlefish.instructions.InstructionType
 class IF {
     private val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
 
-    private fun insideFetch(): List<UShort?> {
+    private suspend fun insideFetch(): List<UShort?> {
         val pc = Register.PC.readPrivilege()
         val full1 = Memory.read(pc.toShort()).toUShort()
 
@@ -33,7 +33,7 @@ class IF {
         return listOf(full1, full2)
     }
 
-    fun fetch() {
+    suspend fun fetch() {
 //        println("Fetching")
         PipeBuffer.pif = insideFetch()
     }
