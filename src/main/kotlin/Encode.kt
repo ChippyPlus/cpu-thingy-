@@ -1,14 +1,13 @@
-package org.cuttlefish.pipelining
+package org.cuttlefish
 
 import org.cuttlefish.data.Register
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
-import java.io.File
 
 class Encode(val instructStr: String) {
     val name = instructStr.split(" ")[0]
-    var full: UShort = 0u
-    var full2: UShort? = null
+    var full: Short = 0
+    var full2: Short? = null
 
     init {
         opcode()
@@ -29,7 +28,7 @@ class Encode(val instructStr: String) {
             }
 
             InstructionType.Immediates -> {
-                full2 = 0u
+                full2 = 0
                 half(1)
                 immediate(instructStr.split(' ')[if (name == "j") 1 else 2].toShort())
                 opcodeOther()
@@ -42,7 +41,7 @@ class Encode(val instructStr: String) {
                 register1()
                 val number = instructStr.split(' ')[2].toShort()
                 val shift = (number.toInt() and 0xFF)
-                full = (full.toInt() or shift).toUShort()
+                full = (full.toInt() or shift).toShort()
                 opcodeOther()
                 halfOther(0)
                 immediateOther(number)
@@ -56,94 +55,64 @@ class Encode(val instructStr: String) {
 
     fun opcode() {
         val code = (mappings[name]!![1] as Number).toByte()
-        full = code.toUShort()
-        full = (full.toInt() shl 16 - 5).toUShort()
+        full = code.toShort()
+        full = (full.toInt() shl 16 - 5).toShort()
     }
 
     fun opcodeOther() {
         val code = (mappings[name]!![1] as Number).toByte()
-        full2 = code.toUShort()
-        full2 = (full2!!.toInt() shl 16 - 5).toUShort()
+        full2 = code.toShort()
+        full2 = (full2!!.toInt() shl 16 - 5).toShort()
     }
 
     fun half(half: Byte) {
         val shift = (half.toInt() shl 16 - 5) shr 1
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
     fun halfOther(half: Byte) {
         val shift = (half.toInt() shl 16 - 5) shr 1
-        full2 = (full2!!.toInt() or shift).toUShort()
+        full2 = (full2!!.toInt() or shift).toShort()
     }
 
 
     fun immediate(number: Short) {
         val shift = (number.toInt() and 0xFF) shl 2
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
     fun immediateOther(number: Short) {
         val shift = ((number.toInt() shr 8) and 0xFF) shl 2
-        full2 = (full2!!.toInt() or shift).toUShort()
+        full2 = (full2!!.toInt() or shift).toShort()
     }
 
 
     fun register1() {
         val ordinal = instructStr.split(' ')[1].toRegister().ordinal
         val shift = (ordinal shl 16 - 5) shr 3
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
     fun register2() {
         val ordinal = instructStr.split(' ')[2].toRegister().ordinal
         val shift = ((ordinal shl 16 - 5) shr 3) shr 3
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
     fun register3() {
         val ordinal = instructStr.split(' ')[3].toRegister().ordinal
         val shift = (((ordinal shl 16 - 5) shr 3) shr 3) shr 3
-        full = (full.toInt() or shift).toUShort()
+        full = (full.toInt() or shift).toShort()
     }
 
 }
 
-val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
-val opcodeMapFullMeta = mappings.entries.associate { (it.value[1] as Number).toInt() to listOf(it.key, it.value) }
-
-//
-//fun main() {
-//    val memory = ShortArray(64) { 0 }
-//    var index = 0
-//    for (line in File("main.lx").readLines()) {
-//        val encode = Encode(line)
-//        memory[index] = encode.full.toShort()
-//        index++
-//        if (encode.full2 != null) {
-//            memory[index] = encode.full2!!.toShort()
-//            index++
-//        }
-//    }
-//
-//    while (Register.PC.readPrivilege().toInt() < index) {
-//        val full1 = memory[Register.PC.readPrivilege().toInt()].toUShort()
-//        val opcode = full1.toInt() shr (16 - 5)
-//        val type = opcodeMap[opcode]
-//        val full2: UShort?
-//        if (type == InstructionType.Immediates || type == InstructionType.RegisterImmediates) {
-//            Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
-//            full2 = memory[Register.PC.readPrivilege().toInt()].toUShort()
-//        } else {
-//            full2 = null
-//        }
-//        println(ID().fmtStructure())
-//        Register.PC.writePrivilege((Register.PC.readPrivilege() + 1u).toUShort())
-//    }
-//}
+//val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
+//val opcodeMapFullMeta = mappings.entries.associate { (it.value[1] as Number).toInt() to listOf(it.key, it.value) }
 
 /** Debugging */
 @Suppress("unused")
-fun UShort.bin() = this.toString(2).padStart(16, '0')
+fun Short.bin() = this.toString(2).padStart(16, '0')
 fun String.toRegister(): Register {
     return Register.valueOf(this.uppercase())
 }

@@ -37,7 +37,6 @@ fun Instruction.load(register1: RegisterValue, address: RegisterAddress): MEMWru
         opName = 'l',
         optionalRegisterLocation = address
     )
-//    return WriteBackOutput(register1.value, address, listOf(register1, address))
 
 }
 

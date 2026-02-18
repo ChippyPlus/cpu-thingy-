@@ -8,7 +8,7 @@ import org.cuttlefish.data.PipeBuffer
  */
 class WB {
 
-    fun writeBack() {
+    suspend fun writeBack() {
 //        println("writing backing")
         if (PipeBuffer.pwb != null) {
             val value = PipeBuffer.pwb!!.value

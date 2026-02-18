@@ -1,18 +1,23 @@
 package org.cuttlefish.data
 
+import kotlinx.coroutines.delay
+
 
 object Memory {
     const val SIZE = 256
-    private val memory = ShortArray(SIZE) { -1 }
-    fun write(address: Short, value: Short) {
+    val memory = ShortArray(SIZE) { -1 }
+    suspend fun write(address: Short, value: Short) {
+        delay(Clock.SPEED_MEMORY_WRITE)
         if (validAddress(address)) {
             memory[address.toInt()] = value
         }
     }
 
-    fun read(address: Short): Short {
+    suspend fun read(address: Short): Short {
+        delay(Clock.SPEED_MEMORY_READ)
+
         if (!validAddress(address)) {
-            return -1 // Would've thrown an exception!!
+            return -1 // Would've thrown an exception!! What a waste! You should know better 🙄
         }
         return memory[address.toInt()]
     }
