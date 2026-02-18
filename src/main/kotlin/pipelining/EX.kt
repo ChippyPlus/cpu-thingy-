@@ -44,7 +44,7 @@ class EX {
                         fmtStructure[2] as RegisterValue,
                         fmtStructure[3] as RegisterAddress,
                     )
-                EXResult.Register(res,fmtStructure)
+                EXResult.Register(res, fmtStructure)
             }
 
             InstructionType.Register2 -> {
@@ -55,23 +55,21 @@ class EX {
                             fmtStructure[1] as RegisterValue,
                             fmtStructure[2] as RegisterValue,
                         )
-                    EXResult.Memory(res,fmtStructure)
-                }
-//                else if (name == "ld") {
-//                    val res =
-//                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput).invoke(
-//                            fmtStructure[1] as RegisterValue,
-//                            fmtStructure[2] as RegisterValue,
-//                        )
-//                    EXResult.Memory(res)
-//                }
-                else {
+                    EXResult.Memory(res, fmtStructure)
+                } else if (name == "ld") {
+                    val res =
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> MEMWruteBackOutput).invoke(
+                            fmtStructure[1] as RegisterValue,
+                            fmtStructure[2] as RegisterAddress,
+                        )
+                    EXResult.Memory(res, fmtStructure)
+                } else {
                     val res =
                         @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
                             fmtStructure[1] as RegisterValue,
                             fmtStructure[2] as RegisterAddress,
                         )
-                    EXResult.Register(res,fmtStructure)
+                    EXResult.Register(res, fmtStructure)
                 }
             }
 
@@ -94,7 +92,7 @@ class EX {
                         @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress, Short) -> WriteBackOutput).invoke(
                             fmtStructure[1] as RegisterAddress, (fmtStructure[2] as Short)
                         )
-                    EXResult.Register(res,fmtStructure)
+                    EXResult.Register(res, fmtStructure)
                 } else {
                     @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, Short) -> Unit).invoke(
                         fmtStructure[1] as RegisterValue, (fmtStructure[2] as Short)
@@ -107,13 +105,11 @@ class EX {
         when (result) {
             is EXResult.Register -> {
                 PipeBuffer.pwb = result.returns
-                PipeBuffer.pwb!!.arguments = result.arguments
 
             }
 
             is EXResult.Memory -> {
                 PipeBuffer.pmem = result.returns
-                PipeBuffer.pmem!!.arguments = result.arguments
             }
 
             is EXResult.Empty -> {}

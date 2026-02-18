@@ -4,7 +4,7 @@ import org.cuttlefish.data.*
 
 fun Instruction.pop(register: RegisterAddress): WriteBackOutput {
     useful
-    return WriteBackOutput(Stack.pop(), register,listOf(register))
+    return WriteBackOutput(Stack.pop(), register)
 }
 
 fun Instruction.push(register: RegisterValue) {
@@ -14,12 +14,12 @@ fun Instruction.push(register: RegisterValue) {
 
 fun Instruction.mov(register1: RegisterValue, register2: RegisterAddress): WriteBackOutput {
     useful
-    return WriteBackOutput(register1.value, register2,listOf(register1,register2))
+    return WriteBackOutput(register1.value, register2)
 }
 
 fun Instruction.li(register: RegisterAddress, value: Short): WriteBackOutput {
     useful
-    return WriteBackOutput(value, register,listOf(register,value))
+    return WriteBackOutput(value, register)
 }
 
 fun Instruction.pr(register: RegisterValue) {
@@ -28,9 +28,16 @@ fun Instruction.pr(register: RegisterValue) {
 }
 
 
-fun Instruction.load(register1: RegisterValue, address: RegisterAddress): WriteBackOutput {
+fun Instruction.load(register1: RegisterValue, address: RegisterAddress): MEMWruteBackOutput {
     useful
-    return WriteBackOutput(register1.value, address,listOf(register1, address))
+
+    return MEMWruteBackOutput(
+        value = 0,
+        location = MemoryAddress(register1.value),
+        opName = 'l',
+        optionalRegisterLocation = address
+    )
+//    return WriteBackOutput(register1.value, address, listOf(register1, address))
 
 }
 
@@ -39,6 +46,7 @@ fun Instruction.store(register1: RegisterValue, address: RegisterValue): MEMWrut
     return MEMWruteBackOutput(
         value = register1.value,
         location = MemoryAddress(address.value),
-        arguments = listOf(register1, address)
+        opName = 's',
+        null
     )
 }

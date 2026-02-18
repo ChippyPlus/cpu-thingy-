@@ -26,15 +26,15 @@ fun main() {
 
     while (Register.PC.readPrivilege().toInt() < index) {
         IF().fetch()
-        println(PipeBuffer)
+//        println(PipeBuffer)
         ID().decode()
-        println(PipeBuffer)
+//        println(PipeBuffer)
         EX().execute()
-        println(PipeBuffer)
+//        println(PipeBuffer)
         MEM().memoryWriteBack()
-        println(PipeBuffer)
+//        println(PipeBuffer)
         WB().writeBack()
-        println(PipeBuffer)
+//        println(PipeBuffer)
 
         //        println(execute)
     }
