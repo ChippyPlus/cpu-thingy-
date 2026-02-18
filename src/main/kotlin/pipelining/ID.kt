@@ -16,14 +16,14 @@ class ID {
 
     
     val name = name()
-    val fmt = mappings[name]!![2] as InstructionType
+    val fmt = mappings[name]!![3] as InstructionType
     fun name(): String {
         val number = (PipeBuffer.pif!![0]!!.toInt() shr 16 - 5).toUShort()
-        return mappings.entries.map { it.value[1] to it.key }.find { it.first == number.toInt() }!!.second
+        return mappings.entries.map { it.value[2] to it.key }.find { it.first == number.toInt() }!!.second
     }
 
     fun fmtStructure(): List<Any> {
-        when (mappings[name]!![2] as InstructionType) {
+        when (mappings[name]!![3] as InstructionType) {
             InstructionType.Register1 -> {
                 val removedOpcode = (PipeBuffer.pif!![0]!!.toInt() shl 5).toUShort()
                 val shift = (removedOpcode.toInt() shr 16 - 3).toUShort()

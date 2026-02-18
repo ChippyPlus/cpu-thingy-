@@ -10,7 +10,7 @@ import org.cuttlefish.instructions.InstructionType
  * 1 Fetch instruction from memory
  */
 class IF {
-    private val opcodeMap = mappings.values.associate { (it[1] as Number).toInt() to (it[2] as InstructionType) }
+    private val opcodeMap = mappings.values.associate { (it[2] as Number).toInt() to (it[3] as InstructionType) }
 
     private suspend fun insideFetch(): List<UShort?> {
         val pc = Register.PC.readPrivilege()

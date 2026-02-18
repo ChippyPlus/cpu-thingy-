@@ -11,7 +11,7 @@ class Encode(val instructStr: String) {
 
     init {
         opcode()
-        when (mappings[name]!![2] as InstructionType) {
+        when (mappings[name]!![3] as InstructionType) {
             InstructionType.Register1 -> {
                 register1()
             }
@@ -54,13 +54,13 @@ class Encode(val instructStr: String) {
     }
 
     fun opcode() {
-        val code = (mappings[name]!![1] as Number).toByte()
+        val code = (mappings[name]!![2] as Number).toByte()
         full = code.toShort()
         full = (full.toInt() shl 16 - 5).toShort()
     }
 
     fun opcodeOther() {
-        val code = (mappings[name]!![1] as Number).toByte()
+        val code = (mappings[name]!![2] as Number).toByte()
         full2 = code.toShort()
         full2 = (full2!!.toInt() shl 16 - 5).toShort()
     }

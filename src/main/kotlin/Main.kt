@@ -11,10 +11,10 @@ suspend fun main() {
     File("main.lx").readLines().forEach { line ->
         if (line.isBlank()) return@forEach
         val encode = Encode(line)
-        Memory.write(index.toShort(), encode.full.toShort())
+        Memory.write(index.toShort(), encode.full)
         index++
         if (encode.full2 != null) {
-            Memory.write(index.toShort(), encode.full2!!.toShort())
+            Memory.write(index.toShort(), encode.full2!!)
             index++
         }
     }
