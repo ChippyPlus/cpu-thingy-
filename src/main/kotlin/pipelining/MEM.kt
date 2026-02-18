@@ -19,7 +19,7 @@ class MEM {
                 val location = input.location.value
                 val value = input.value
                 Memory.write(location, value)
-                println("MEM: Stored $value at address $location")
+//                println("MEM: Stored $value at address $location")
             }
 
             'l' -> {
@@ -29,7 +29,7 @@ class MEM {
                 PipeBuffer.pwb = WriteBackOutput(
                     value = memValue, location = input.optionalRegisterLocation!!
                 )
-                println("MEM: Loaded $memValue from $addressToRead, sending to ${input.optionalRegisterLocation}")
+//                println("MEM: Loaded $memValue from $addressToRead, sending to ${input.optionalRegisterLocation}")
             }
 
             else -> {
@@ -37,7 +37,6 @@ class MEM {
             }
         }
 
-        // 4. Clear the buffer so we don't repeat this
         PipeBuffer.pmem = null
     }
 }

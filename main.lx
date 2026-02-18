@@ -1,5 +1,5 @@
-li r1 20
-li r2 10
-st r1 r2
-ld r2 r3
+li r1 20 // R1 = 20
+li r2 10 //  R2 = 10
+st r1 r2 // [10] = 20
+ld r2 r3 // R3 = *[10]
 pr r3
