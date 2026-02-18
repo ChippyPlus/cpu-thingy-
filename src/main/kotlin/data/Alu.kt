@@ -83,4 +83,18 @@ object Alu {
         } else 0
     }
 
+    suspend fun alu_gt(a: Short, b: Short): Short {
+        delay(Clock.SPEED_ALU)
+        return if (a > b) {
+            1
+        } else 0
+    }
+
+    suspend fun alu_gte(a: Short, b: Short): Short {
+        delay(Clock.SPEED_ALU)
+        return if (a >= b) {
+            1
+        } else 0
+    }
+
 }
