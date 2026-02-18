@@ -76,7 +76,6 @@ class Decode {
 
 
 
-
                 return listOf(name, (immediate2.toInt() or immediate1.toInt()).toUShort())
             }
 

@@ -1,6 +1,5 @@
 package org.cuttlefish
 
-import kotlinx.serialization.encoding.Decoder
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.Register
 import org.cuttlefish.pipelining.Decode
@@ -9,8 +8,8 @@ import java.io.File
 
 fun main() {
     var index = 0
-    File("main.lx").readLines().forEach { line ->
-        if (line.isBlank()) return@forEach
+    File("main.lx").readLines().forEach Loop@{ line ->
+        if (line.isBlank()) return@Loop
         val encode = Encode(line)
         Memory.write(index.toShort(), encode.full.toShort())
         index++
@@ -21,7 +20,10 @@ fun main() {
     }
 
     while (Register.PC.read().toInt() < index) {
+        // fetch????
         Register.INSTR.write(Memory.read(Register.PC.read()))
+
+
         println(Register.INSTR.read())
         println(Decode().decode())
 
