@@ -2,6 +2,7 @@ package org.cuttlefish.pipelining
 
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.PipeBuffer
+import org.cuttlefish.data.RegisterAddress
 import org.cuttlefish.data.WriteBackOutput
 
 
@@ -10,7 +11,7 @@ import org.cuttlefish.data.WriteBackOutput
  */
 class MEM {
     fun memoryWriteBack() {
-        println("memory writing backing")
+//        println("memory writing backing")
 
         if (PipeBuffer.pmem != null) {
             when (ID().name) {
@@ -23,7 +24,11 @@ class MEM {
                 "ld" -> {
                     val value = PipeBuffer.pmem!!.value
                     val memEX = Memory.read(value)
-                    PipeBuffer.pwb = WriteBackOutput(memEX, PipeBuffer.pmem!!.optionalRegisterLocation!!)
+                    PipeBuffer.pwb = WriteBackOutput(
+                        memEX,
+                        PipeBuffer.pmem!!.arguments[1] as RegisterAddress,
+                        PipeBuffer.pmem!!.arguments
+                    )
 
                 }
 

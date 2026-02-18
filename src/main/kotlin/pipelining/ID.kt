@@ -156,7 +156,7 @@ class ID {
     }
 
     fun decode() {
-        println("decoding")
+//        println("decoding")
         PipeBuffer.pid = DecodeInstruction(
             full1 = PipeBuffer.pif!![0]!!,
             full2 = PipeBuffer.pif!![1],

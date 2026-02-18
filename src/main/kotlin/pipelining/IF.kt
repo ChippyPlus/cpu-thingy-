@@ -34,7 +34,7 @@ class IF {
     }
 
     fun fetch() {
-        println("Fetching")
+//        println("Fetching")
         PipeBuffer.pif = insideFetch()
     }
 }

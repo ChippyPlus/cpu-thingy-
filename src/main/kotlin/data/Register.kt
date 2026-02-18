@@ -44,9 +44,8 @@ data class DecodeInstruction(
     val registerStructure: List<Any>,
 )
 
-data class WriteBackOutput(val value: Short, val location: RegisterAddress)
+data class WriteBackOutput(val value: Short, val location: RegisterAddress, var arguments: List<Any>)
 data class MEMWruteBackOutput(
-    val value: Short,
-    val location: MemoryAddress,
-    val optionalRegisterLocation: RegisterAddress?
+    val value: Short, val location: MemoryAddress, var arguments: List<Any>
+    //    val optionalRegisterLocation: RegisterAddress
 )
