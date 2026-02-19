@@ -55,6 +55,6 @@ data class DecodeInstruction(
 
 data class WriteBackOutput(val value: Short, val location: RegisterAddress)
 data class MEMWruteBackOutput(
-    val value: Short, val location: MemoryAddress, val opName:Char,
+    val value: Short, val location: MemoryAddress, val opName: Char,
     val optionalRegisterLocation: RegisterAddress?
 )

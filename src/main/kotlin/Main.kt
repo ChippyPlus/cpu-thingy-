@@ -19,10 +19,10 @@ suspend fun main() {
         }
     }
 
-    println(Memory.memory.toList().subList(0,10))
-    for (i in 0..6) {
-        println(Memory.read(i.toShort()))
-    }
+//    println(Memory.memory.toList().subList(0,10))
+//    for (i in 0..6) {
+//        println(Memory.read(i.toShort()))
+//    }
 
     // shh! this is encoding
 
@@ -30,17 +30,15 @@ suspend fun main() {
 
 
     while (Register.PC.readPrivilege().toInt() < index) {
-        IF().fetch()
-//        println(PipeBuffer)
-        ID().decode()
-//        println(PipeBuffer)
-        EX().execute()
-//        println(PipeBuffer)
-        MEM().memoryWriteBack()
-//        println(PipeBuffer)
-        WB().writeBack()
-//        println(PipeBuffer)
 
-        //        println(execute)
     }
+}
+
+
+suspend fun cycle() {
+    IF().fetch()
+    ID().decode()
+    EX().execute()
+    MEM().memoryWriteBack()
+    WB().writeBack()
 }

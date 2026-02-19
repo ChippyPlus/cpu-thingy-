@@ -1,42 +1,58 @@
 package org.cuttlefish
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
 
+data class WorkUnit(val tick: Int, val payload: String)
 
-suspend fun main() = run {
-    while (true) {
-        try {
-            coroutineScope {
-                val ticker = flow {
-                    var count = 0
-                    while (true) {
-                        emit(count++)
-                        delay(1000)
-                        println(currentCoroutineContext().isActive)
-                    }
-                }.shareIn(this, SharingStarted.Lazily)
+@OptIn(ExperimentalCoroutinesApi::class)
+suspend fun main(): Unit = coroutineScope {
+    // 1. Create the source of the pipeline (The Ticker)
+    val pipelineSource = produce(Dispatchers.Default) {
+        var tick = 0
+        while (isActive) {
+            send(WorkUnit(tick, "Initial Message"))
+            println("Source: Sent Tick $tick")
+            tick++
+            delay(1000) // New work enters every second
+        }
+    }
 
-                val jobs = (1..5).map { id ->
-                    launch {
-                        ticker.collect { tick ->
-                            if (tick >= 5) {
-                                println("Worker $id is requesting cancel")
-                                this@coroutineScope.cancel()
-                            }
-                            doWork(id, tick)
-                        }
-                    }
+    val stage1 = buildStage(this, "Stage 1", pipelineSource, ::m1)
+    val stage2 = buildStage(this, "Stage 2", stage1, ::m2)
+    val stage3 = buildStage(this, "Stage 3", stage2, ::m3)
+    val stage4 = buildStage(this, "Stage 4", stage3, ::m4)
+    val resultPipeline = buildStage(this, "Stage 5", stage4, ::m5)
 
-                }
-            }
-        } catch (e: Exception) {
+    launch {
+        for (result in resultPipeline) {
+            println("Result OUT: ${result.payload}")
+            println("-----------------------------")
         }
     }
 }
 
-fun doWork(id: Int, tick: Int) {
-    println("Worker $id: $tick at ${System.currentTimeMillis() % 10000}ms")
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun buildStage(
+    scope: CoroutineScope,
+    name: String,
+    input: ReceiveChannel<WorkUnit>,
+    processor: (Int, Int, String) -> String
+): ReceiveChannel<WorkUnit> = scope.produce(Dispatchers.Default) {
+    for (unit in input) {
+        delay(500)
+
+        val newPayload = processor(0, unit.tick, unit.payload)
+        println("$name: Processed Tick ${unit.tick}")
+
+        send(unit.copy(payload = newPayload))
+    }
 }
+
+fun m1(id: Int, tick: Int, msg: String) = "$msg -> [M1]"
+fun m2(id: Int, tick: Int, msg: String) = "$msg -> [M2]"
+fun m3(id: Int, tick: Int, msg: String) = "$msg -> [M3]"
+fun m4(id: Int, tick: Int, msg: String) = "$msg -> [M4]"
+fun m5(id: Int, tick: Int, msg: String) = "$msg -> [M5]"
