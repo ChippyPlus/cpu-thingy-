@@ -4,61 +4,78 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 
-data class CpuState(
-    var tick: Int = 0,
-    var s1: String? = null,
-    var s2: String? = null,
-    var s3: String? = null,
-    var s4: String? = null,
-    var s5: String? = null
-)
+object Buffer {
+    var stage1: String? = null
+    var stage2: String? = null
+    var stage3: String? = null
+    var stage4: String? = null
+    var stage5: String? = null
+    var tick: Int = 0
+}
 
 suspend fun main() = coroutineScope {
-    val cpu = CpuState()
     var cycleCount = 1
 
     val clock = flow {
-        while (cycleCount < 13) {
+        while (cycleCount <= 13) {
             emit(Unit)
             delay(1000)
         }
     }
 
     clock.collect {
-        println("\n------- Cycle $cycleCount -------")
+        println("\n--- Cycle $cycleCount ---")
 
-        val retired = cpu.s5
-        cpu.s5 = cpu.s4
-        cpu.s4 = cpu.s3
-        cpu.s3 = cpu.s2
-        cpu.s2 = cpu.s1
+        val retired = Buffer.stage5
+        Buffer.stage5 = Buffer.stage4
+        Buffer.stage4 = Buffer.stage3
+        Buffer.stage3 = Buffer.stage2
+        Buffer.stage2 = Buffer.stage1
 
-        cpu.s1 = "Instruction ${cpu.tick}"
+        Buffer.stage1 = "Instruction ${Buffer.tick}"
+        Buffer.tick++
 
-        val displayS1 = cpu.s1?.let { m1(it) } ?: "empty"
-        val displayS2 = cpu.s2?.let { m2(it) } ?: "empty"
-        val displayS3 = cpu.s3?.let { m3(it) } ?: "empty"
-        val displayS4 = cpu.s4?.let { m4(it) } ?: "empty"
-        val displayS5 = cpu.s5?.let { m5(it) } ?: "empty"
+        val s1Msg = m1()
+        val s2Msg = m2()
+        val s3Msg = m3()
+        val s4Msg = m4()
+        val s5Msg = m5()
 
-        println("| S1 (Fetch)    | $displayS1")
-        println("| S2 (Decode)   | $displayS2")
-        println("| S3 (Execute)  | $displayS3")
-        println("| S4 (Memory)   | $displayS4")
-        println("| S5 (Write)    | $displayS5")
+        println("| S1 (Fetch)   | $s1Msg")
+        println("| S2 (Decode)  | $s2Msg")
+        println("| S3 (Execute) | $s3Msg")
+        println("| S4 (Memory)  | $s4Msg")
+        println("| S5 (Write)   | $s5Msg")
 
         if (retired != null) {
-            println("✅ [RETIRED] Finished processing: $retired")
+            println("✅ [RETIRED] Completed: $retired")
         }
 
-        cpu.tick++
         cycleCount++
     }
 }
 
-// Logic functions
-fun m1(msg: String) = "Fetched $msg"
-fun m2(msg: String) = "Decoded ($msg)"
-fun m3(msg: String) = "Executing ($msg)"
-fun m4(msg: String) = "Mem-Stored ($msg)"
-fun m5(msg: String) = "Done ($msg)"
+suspend fun m1(): String {
+    delay(10)
+    return Buffer.stage1?.let { "Fetched $it" } ?: "empty"
+}
+
+suspend fun m2(): String {
+    delay(10)
+    return Buffer.stage2?.let { "Decoded ($it)" } ?: "empty"
+}
+
+suspend fun m3(): String {
+    delay(10)
+    return Buffer.stage3?.let { "Executing ($it)" } ?: "empty"
+}
+
+suspend fun m4(): String {
+    delay(10)
+    return Buffer.stage4?.let { "Mem-Stored ($it)" } ?: "empty"
+}
+
+suspend fun m5(): String {
+    delay(10)
+    return Buffer.stage5?.let { "Done ($it)" } ?: "empty"
+}
