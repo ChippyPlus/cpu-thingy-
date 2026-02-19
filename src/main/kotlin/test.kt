@@ -2,80 +2,65 @@ package org.cuttlefish
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 
-object Buffer {
-    var stage1: String? = null
-    var stage2: String? = null
-    var stage3: String? = null
-    var stage4: String? = null
-    var stage5: String? = null
-    var tick: Int = 0
+class Pipeline {
+    private var stage1: String? = null
+    private var stage2: String? = null
+    private var stage3: String? = null
+    private var stage4: String? = null
+    private var stage5: String? = null
+    private var instructionCount: Int = 0
+
+    suspend fun step(cycle: Int) {
+        println("\n--- Cycle $cycle ---")
+
+        val retired = stage5
+        stage5 = stage4
+        stage4 = stage3
+        stage3 = stage2
+        stage2 = stage1
+
+        stage1 = "Instruction $instructionCount"
+        instructionCount++
+
+        // 3. Execute Stages
+        val results = listOf(
+            m1(stage1), m2(stage2), m3(stage3), m4(stage4), m5(stage5)
+        )
+
+        // 4. Print Status
+        val labels = listOf("S1 (Fetch)", "S2 (Decode)", "S3 (Execute)", "S4 (Memory)", "S5 (Write)")
+        labels.zip(results).forEach { (label, msg) ->
+            println("| ${label.padEnd(12)} | $msg")
+        }
+
+        retired?.let { println("✅ [RETIRED] Completed: $it") }
+    }
+
+    private suspend fun m1(s: String?) = delay(10).run { s?.let { "Fetched $it" } ?: "empty" }
+    private suspend fun m2(s: String?) = delay(10).run { s?.let { "Decoded ($it)" } ?: "empty" }
+    private suspend fun m3(s: String?) = delay(10).run { s?.let { "Executing ($it)" } ?: "empty" }
+    private suspend fun m4(s: String?) = delay(10).run { s?.let { "Mem-Stored ($it)" } ?: "empty" }
+    private suspend fun m5(s: String?) = delay(10).run { s?.let { "Done ($it)" } ?: "empty" }
+}
+
+class Clock(private val maxCycles: Int, private val tickRateMs: Long = 1000) {
+    private var currentCycle = 1
+    suspend fun tick(block: suspend (Int) -> Unit): Boolean {
+        if (currentCycle > maxCycles) return false
+
+        block(currentCycle)
+        delay(tickRateMs)
+        currentCycle++
+        return true
+    }
 }
 
 suspend fun main() = coroutineScope {
-    var cycleCount = 1
+    val pipeline = Pipeline()
+    val clock = Clock(maxCycles = 13)
 
-    val clock = flow {
-        while (cycleCount <= 13) {
-            emit(Unit)
-            delay(1000)
-        }
-    }
+    while (clock.tick { cycle -> pipeline.step(cycle) })
 
-    clock.collect {
-        println("\n--- Cycle $cycleCount ---")
-
-        val retired = Buffer.stage5
-        Buffer.stage5 = Buffer.stage4
-        Buffer.stage4 = Buffer.stage3
-        Buffer.stage3 = Buffer.stage2
-        Buffer.stage2 = Buffer.stage1
-
-        Buffer.stage1 = "Instruction ${Buffer.tick}"
-        Buffer.tick++
-
-        val s1Msg = m1()
-        val s2Msg = m2()
-        val s3Msg = m3()
-        val s4Msg = m4()
-        val s5Msg = m5()
-
-        println("| S1 (Fetch)   | $s1Msg")
-        println("| S2 (Decode)  | $s2Msg")
-        println("| S3 (Execute) | $s3Msg")
-        println("| S4 (Memory)  | $s4Msg")
-        println("| S5 (Write)   | $s5Msg")
-
-        if (retired != null) {
-            println("✅ [RETIRED] Completed: $retired")
-        }
-
-        cycleCount++
-    }
-}
-
-suspend fun m1(): String {
-    delay(10)
-    return Buffer.stage1?.let { "Fetched $it" } ?: "empty"
-}
-
-suspend fun m2(): String {
-    delay(10)
-    return Buffer.stage2?.let { "Decoded ($it)" } ?: "empty"
-}
-
-suspend fun m3(): String {
-    delay(10)
-    return Buffer.stage3?.let { "Executing ($it)" } ?: "empty"
-}
-
-suspend fun m4(): String {
-    delay(10)
-    return Buffer.stage4?.let { "Mem-Stored ($it)" } ?: "empty"
-}
-
-suspend fun m5(): String {
-    delay(10)
-    return Buffer.stage5?.let { "Done ($it)" } ?: "empty"
+        println("\nSimulation complete.")
 }
