@@ -1,58 +1,64 @@
 package org.cuttlefish
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 
-data class WorkUnit(val tick: Int, val payload: String)
+data class CpuState(
+    var tick: Int = 0,
+    var s1: String? = null,
+    var s2: String? = null,
+    var s3: String? = null,
+    var s4: String? = null,
+    var s5: String? = null
+)
 
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun main(): Unit = coroutineScope {
-    // 1. Create the source of the pipeline (The Ticker)
-    val pipelineSource = produce(Dispatchers.Default) {
-        var tick = 0
-        while (isActive) {
-            send(WorkUnit(tick, "Initial Message"))
-            println("Source: Sent Tick $tick")
-            tick++
-            delay(1000) // New work enters every second
+suspend fun main() = coroutineScope {
+    val cpu = CpuState()
+    var cycleCount = 1
+
+    val clock = flow {
+        while (cycleCount < 13) {
+            emit(Unit)
+            delay(1000)
         }
     }
 
-    val stage1 = buildStage(this, "Stage 1", pipelineSource, ::m1)
-    val stage2 = buildStage(this, "Stage 2", stage1, ::m2)
-    val stage3 = buildStage(this, "Stage 3", stage2, ::m3)
-    val stage4 = buildStage(this, "Stage 4", stage3, ::m4)
-    val resultPipeline = buildStage(this, "Stage 5", stage4, ::m5)
+    clock.collect {
+        println("\n------- Cycle $cycleCount -------")
 
-    launch {
-        for (result in resultPipeline) {
-            println("Result OUT: ${result.payload}")
-            println("-----------------------------")
+        val retired = cpu.s5
+        cpu.s5 = cpu.s4
+        cpu.s4 = cpu.s3
+        cpu.s3 = cpu.s2
+        cpu.s2 = cpu.s1
+
+        cpu.s1 = "Instruction ${cpu.tick}"
+
+        val displayS1 = cpu.s1?.let { m1(it) } ?: "empty"
+        val displayS2 = cpu.s2?.let { m2(it) } ?: "empty"
+        val displayS3 = cpu.s3?.let { m3(it) } ?: "empty"
+        val displayS4 = cpu.s4?.let { m4(it) } ?: "empty"
+        val displayS5 = cpu.s5?.let { m5(it) } ?: "empty"
+
+        println("| S1 (Fetch)    | $displayS1")
+        println("| S2 (Decode)   | $displayS2")
+        println("| S3 (Execute)  | $displayS3")
+        println("| S4 (Memory)   | $displayS4")
+        println("| S5 (Write)    | $displayS5")
+
+        if (retired != null) {
+            println("✅ [RETIRED] Finished processing: $retired")
         }
+
+        cpu.tick++
+        cycleCount++
     }
 }
 
-
-@OptIn(ExperimentalCoroutinesApi::class)
-fun buildStage(
-    scope: CoroutineScope,
-    name: String,
-    input: ReceiveChannel<WorkUnit>,
-    processor: (Int, Int, String) -> String
-): ReceiveChannel<WorkUnit> = scope.produce(Dispatchers.Default) {
-    for (unit in input) {
-        delay(500)
-
-        val newPayload = processor(0, unit.tick, unit.payload)
-        println("$name: Processed Tick ${unit.tick}")
-
-        send(unit.copy(payload = newPayload))
-    }
-}
-
-fun m1(id: Int, tick: Int, msg: String) = "$msg -> [M1]"
-fun m2(id: Int, tick: Int, msg: String) = "$msg -> [M2]"
-fun m3(id: Int, tick: Int, msg: String) = "$msg -> [M3]"
-fun m4(id: Int, tick: Int, msg: String) = "$msg -> [M4]"
-fun m5(id: Int, tick: Int, msg: String) = "$msg -> [M5]"
+// Logic functions
+fun m1(msg: String) = "Fetched $msg"
+fun m2(msg: String) = "Decoded ($msg)"
+fun m3(msg: String) = "Executing ($msg)"
+fun m4(msg: String) = "Mem-Stored ($msg)"
+fun m5(msg: String) = "Done ($msg)"
