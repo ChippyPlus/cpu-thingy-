@@ -25,7 +25,7 @@ sealed interface EXResult {
 class EX(val p2idDataFlow: DataFlow) {
     var aluResult: AluResult? = null
 
-    private fun innerExecute() = when (p2idDataFlow.decode) {
+    private suspend fun innerExecute() = when (p2idDataFlow.decode) {
         is Maybe.Some -> {
             val decoded = p2idDataFlow.decode.value
             val fmt = decoded.format
@@ -36,13 +36,13 @@ class EX(val p2idDataFlow: DataFlow) {
 
                     if (decoded.name == "pop") {
                         val res =
-                            @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress) -> WriteBackOutput_old).invoke(
+                            @Suppress("UNCHECKED_CAST") (kFunctionExe as suspend (RegisterAddress) -> WriteBackOutput_old).invoke(
                                 fmtStructure[1] as RegisterAddress
                             )
                         AluResult.Register(WriteBackOutput(value = res.value, location = res.location))
 
                     } else {
-                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as suspend (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
                         AluResult.Empty
                     }
                 }
@@ -50,7 +50,7 @@ class EX(val p2idDataFlow: DataFlow) {
 
                 InstructionType.Register3 -> {
                     val res =
-                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue, RegisterAddress) -> WriteBackOutput_old).invoke(
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as suspend (RegisterValue, RegisterValue, RegisterAddress) -> WriteBackOutput_old).invoke(
                             fmtStructure[1] as RegisterValue,
                             fmtStructure[2] as RegisterValue,
                             fmtStructure[3] as RegisterAddress,
@@ -63,7 +63,7 @@ class EX(val p2idDataFlow: DataFlow) {
 
                     if (decoded.name == "st") {
                         val res: MEMWruteBackOutput_old =
-                            @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput_old).invoke(
+                            @Suppress("UNCHECKED_CAST") (kFunctionExe as suspend (RegisterValue, RegisterValue) -> MEMWruteBackOutput_old).invoke(
                                 fmtStructure[1] as RegisterValue,
                                 fmtStructure[2] as RegisterValue,
                             )
@@ -131,10 +131,10 @@ class EX(val p2idDataFlow: DataFlow) {
             }
         }
 
-        is Maybe.None -> throw IllegalStateException()
+        is Maybe.Not -> throw IllegalStateException()
     }
 
-    fun execute(): DataFlow? {
+    suspend fun execute(): DataFlow? {
         innerExecute()
         return when (val r = aluResult!!) {
             is AluResult.Register -> {

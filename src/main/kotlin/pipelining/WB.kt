@@ -1,19 +1,22 @@
 package org.cuttlefish.pipelining
 
-import org.cuttlefish.data.PipeBuffer
+import org.cuttlefish.DataFlow
+import org.cuttlefish.util.Maybe
 
 
 /**
  * 5 Write the result into a register
  */
-class WB {
+class WB(val p4memDataFlow: DataFlow) {
 
     suspend fun writeBack() {
-//        println("writing backing")
-        if (PipeBuffer.pwb_deprecated != null) {
-            val value = PipeBuffer.pwb_deprecated!!.value
-            val location = PipeBuffer.pwb_deprecated!!.location.value
-            location.write(value)
+        when (val wb = p4memDataFlow.writeBack) {
+            is Maybe.Some -> {
+                val (value, location) = wb.value
+                location.value.write(value)
+            }
+
+            is Maybe.Not -> {}
         }
     }
 }

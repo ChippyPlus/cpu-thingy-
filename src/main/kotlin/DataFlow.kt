@@ -8,10 +8,10 @@ import org.cuttlefish.util.Maybe
 
 data class DataFlow(
     var p1if: List<UShort?>? = null,
-    val decode: Maybe<DecodeOutput> = Maybe.None,
-    val aluResult: Maybe<AluResult> = Maybe.None,
-    val writeBack: Maybe<WriteBackOutput> = Maybe.None,
-    val memWrite: Maybe<MemWriteOutput> = Maybe.None
+    val decode: Maybe<DecodeOutput> = Maybe.Not,
+    val aluResult: Maybe<AluResult> = Maybe.Not,
+    val writeBack: Maybe<WriteBackOutput> = Maybe.Not,
+    val memWrite: Maybe<MemWriteOutput> = Maybe.Not
 )
 
 data class DecodeOutput(
