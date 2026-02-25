@@ -1,12 +1,12 @@
 package org.cuttlefish
 
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.Register
 import org.cuttlefish.pipelining.*
 import java.io.File
 
-suspend fun main() {
+suspend fun main() = coroutineScope {
     var index = 0
     File("main.lx").readLines().forEach { line ->
         if (line.isBlank()) return@forEach
@@ -19,19 +19,11 @@ suspend fun main() {
         }
     }
 
-//    println(Memory.memory.toList().subList(0,10))
-//    for (i in 0..6) {
-//        println(Memory.read(i.toShort()))
-//    }
-
-    // shh! this is encoding
-
-
-
-
     while (Register.PC.readPrivilege().toInt() < index) {
 
     }
+
+
 }
 
 
