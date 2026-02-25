@@ -21,10 +21,10 @@ object PipeBuffer {
     var pex_deprecated: EXResult? = null
 
     @Deprecated("Using new stages")
-    var pmem_deprecated: MEMWruteBackOutput? = null
+    var pmem_deprecated: MEMWruteBackOutput_old? = null
 
     @Deprecated("Using new stages")
-    var pwb_deprecated: WriteBackOutput? = null
+    var pwb_deprecated: WriteBackOutput_old? = null
 
     private var instructionCount: Int = 0
 

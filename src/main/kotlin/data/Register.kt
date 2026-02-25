@@ -53,16 +53,14 @@ data class DecodeInstruction(
     val registerStructure: List<Any>,
 )
 
+@Suppress("ClassName")
 @Deprecated("In favour of DataFlow")
-data class WriteBackOutput(
-    val value: Short,
-    val location: RegisterAddress
+data class WriteBackOutput_old(
+    val value: Short, val location: RegisterAddress
 )
 
+@Suppress("ClassName")
 @Deprecated("In favour of DataFlow")
-data class MEMWruteBackOutput(
-    val value: Short,
-    val location: MemoryAddress,
-    val opName: Char,
-    val optionalRegisterLocation: RegisterAddress?
+data class MEMWruteBackOutput_old(
+    val value: Short, val location: MemoryAddress, val opName: Char, val optionalRegisterLocation: RegisterAddress?
 )

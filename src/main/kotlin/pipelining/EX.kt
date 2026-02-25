@@ -1,120 +1,152 @@
 package org.cuttlefish.pipelining
 
-import org.cuttlefish.data.*
+import org.cuttlefish.AluResult
+import org.cuttlefish.DataFlow
+import org.cuttlefish.MemWriteOutput
+import org.cuttlefish.WriteBackOutput
+import org.cuttlefish.data.MEMWruteBackOutput_old
+import org.cuttlefish.data.RegisterAddress
+import org.cuttlefish.data.RegisterValue
+import org.cuttlefish.data.WriteBackOutput_old
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
+import org.cuttlefish.util.Maybe
 
 @Deprecated("In favour of DataFlow")
 sealed interface EXResult {
-    data class Register(val returns: WriteBackOutput, val arguments: List<Any>) : EXResult
-    data class Memory(val returns: MEMWruteBackOutput, val arguments: List<Any>) : EXResult
+    data class Register(val returns: WriteBackOutput_old) : EXResult
+    data class Memory(val returns: MEMWruteBackOutput_old) : EXResult
     object Empty : EXResult
 }
 
 /**
  * 3 Execute the operation or calculate address
  */
-class EX {
-    fun execute() {
-//        println("executing")
-        val decoded = PipeBuffer.pid_deprecated!!
-        val name = decoded.name
-        val fmt = decoded.format
-        val kFunctionExe = mappings[name]!![0]
-        val fmtStructure = decoded.registerStructure
-        val result: EXResult = when (fmt) {
-            InstructionType.Register1 -> {
+class EX(val p2idDataFlow: DataFlow) {
+    var aluResult: AluResult? = null
 
-                if (name == "pop") {
-                    val res = @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress) -> WriteBackOutput).invoke(
-                        fmtStructure[1] as RegisterAddress
-                    )
-                    EXResult.Register(res, fmtStructure)
-                } else {
-                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
-                    EXResult.Empty
+    private fun innerExecute() = when (p2idDataFlow.decode) {
+        is Maybe.Some -> {
+            val decoded = p2idDataFlow.decode.value
+            val fmt = decoded.format
+            val kFunctionExe = mappings[decoded.name]!![0]
+            val fmtStructure = decoded.registerStructure
+            aluResult = when (fmt) {
+                InstructionType.Register1 -> {
+
+                    if (decoded.name == "pop") {
+                        val res =
+                            @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress) -> WriteBackOutput_old).invoke(
+                                fmtStructure[1] as RegisterAddress
+                            )
+                        AluResult.Register(WriteBackOutput(value = res.value, location = res.location))
+
+                    } else {
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
+                        AluResult.Empty
+                    }
                 }
-            }
 
 
-            InstructionType.Register3 -> {
-                val res =
-                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
-                        fmtStructure[1] as RegisterValue,
-                        fmtStructure[2] as RegisterValue,
-                        fmtStructure[3] as RegisterAddress,
-                    )
-                EXResult.Register(res, fmtStructure)
-            }
-
-            InstructionType.Register2 -> {
-
-                if (name == "st") {
-                    val res: MEMWruteBackOutput =
-                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput).invoke(
+                InstructionType.Register3 -> {
+                    val res =
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue, RegisterAddress) -> WriteBackOutput_old).invoke(
                             fmtStructure[1] as RegisterValue,
                             fmtStructure[2] as RegisterValue,
+                            fmtStructure[3] as RegisterAddress,
                         )
-                    EXResult.Memory(returns = res, arguments = fmtStructure)
-                } else if (name == "ld") {
-                    val res: MEMWruteBackOutput =
-                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> MEMWruteBackOutput).invoke(
-                            fmtStructure[1] as RegisterValue,
-                            fmtStructure[2] as RegisterAddress,
-                        )
-                    EXResult.Memory(returns = res, arguments = fmtStructure)
-                } else {
-                    val res: WriteBackOutput =
-                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> WriteBackOutput).invoke(
-                            fmtStructure[1] as RegisterValue,
-                            fmtStructure[2] as RegisterAddress,
-                        )
-                    EXResult.Register(res, fmtStructure)
+
+                    AluResult.Register(WriteBackOutput(value = res.value, location = res.location))
                 }
-            }
 
-            InstructionType.Immediates -> {
-                @Suppress("UNCHECKED_CAST") (kFunctionExe as (UShort) -> Unit).invoke(
-                    (fmtStructure[1] as UShort)
-                )
-                EXResult.Empty
-            }
+                InstructionType.Register2 -> {
 
-            InstructionType.StandAlone -> {
-                EXResult.Empty
-            }
-
-            InstructionType.RegisterImmediates -> {
-
-
-                if (name == "li") { // RegisterADDRESS
-                    val res =
-                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress, Short) -> WriteBackOutput).invoke(
-                            fmtStructure[1] as RegisterAddress, (fmtStructure[2] as Short)
+                    if (decoded.name == "st") {
+                        val res: MEMWruteBackOutput_old =
+                            @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterValue) -> MEMWruteBackOutput_old).invoke(
+                                fmtStructure[1] as RegisterValue,
+                                fmtStructure[2] as RegisterValue,
+                            )
+                        AluResult.Memory(
+                            returns = MemWriteOutput(
+                                value = res.value,
+                                location = res.location,
+                                opName = res.opName,
+                                optionalRegisterLocation = null
+                            )
                         )
-                    EXResult.Register(res, fmtStructure)
-                } else {
-                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, Short) -> Unit).invoke(
-                        fmtStructure[1] as RegisterValue, (fmtStructure[2] as Short)
+                    } else if (decoded.name == "ld") {
+                        val res: MEMWruteBackOutput_old =
+                            @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> MEMWruteBackOutput_old).invoke(
+                                fmtStructure[1] as RegisterValue,
+                                fmtStructure[2] as RegisterAddress,
+                            )
+                        AluResult.Memory(
+                            returns = MemWriteOutput(
+                                value = res.value,
+                                location = res.location,
+                                opName = res.opName,
+                                optionalRegisterLocation = null
+                            )
+                        )
+                    } else {
+                        val res: WriteBackOutput_old =
+                            @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, RegisterAddress) -> WriteBackOutput_old).invoke(
+                                fmtStructure[1] as RegisterValue,
+                                fmtStructure[2] as RegisterAddress,
+                            )
+                        AluResult.Register(WriteBackOutput(value = res.value, location = res.location))
+
+                    }
+                }
+
+                InstructionType.Immediates -> {
+                    @Suppress("UNCHECKED_CAST") (kFunctionExe as (UShort) -> Unit).invoke(
+                        (fmtStructure[1] as UShort)
                     )
-                    EXResult.Empty
+                    AluResult.Empty
+                }
+
+                InstructionType.StandAlone -> {
+                    AluResult.Empty
+                }
+
+                InstructionType.RegisterImmediates -> {
+
+
+                    if (decoded.name == "li") { // RegisterADDRESS
+                        val res =
+                            @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterAddress, Short) -> WriteBackOutput_old).invoke(
+                                fmtStructure[1] as RegisterAddress, (fmtStructure[2] as Short)
+                            )
+                        AluResult.Register(WriteBackOutput(value = res.value, location = res.location))
+
+                    } else {
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as (RegisterValue, Short) -> Unit).invoke(
+                            fmtStructure[1] as RegisterValue, (fmtStructure[2] as Short)
+                        )
+                        AluResult.Empty
+                    }
                 }
             }
         }
 
-        when (result) {
-            is EXResult.Register -> {
-                PipeBuffer.pwb_deprecated = result.returns
+        is Maybe.None -> throw IllegalStateException()
+    }
 
+    fun execute(): DataFlow? {
+        innerExecute()
+        return when (val r = aluResult!!) {
+            is AluResult.Register -> {
+                p2idDataFlow.copy(writeBack = Maybe.Some(r.returns))
             }
 
-            is EXResult.Memory -> {
-                PipeBuffer.pmem_deprecated = result.returns
+            is AluResult.Memory -> {
+                p2idDataFlow.copy(memWrite = Maybe.Some(r.returns))
             }
 
-            is EXResult.Empty -> {}
+            is AluResult.Empty -> null
         }
-
     }
 
 

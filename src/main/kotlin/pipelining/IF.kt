@@ -1,5 +1,6 @@
 package org.cuttlefish.pipelining
 
+import org.cuttlefish.DataFlow
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.PipeBuffer
 import org.cuttlefish.data.Register
@@ -9,7 +10,7 @@ import org.cuttlefish.instructions.InstructionType
 /**
  * 1 Fetch instruction from memory
  */
-class IF {
+class IF(var newFlow: DataFlow = DataFlow()) {
     private val opcodeMap = mappings.values.associate { (it[2] as Number).toInt() to (it[3] as InstructionType) }
 
     private suspend fun insideFetch(): List<UShort?> {
@@ -33,9 +34,9 @@ class IF {
         return listOf(full1, full2)
     }
 
-    suspend fun fetch() {
-        PipeBuffer.p1if.p1if = insideFetch()
-
+    suspend fun fetch(): DataFlow {
+        newFlow = DataFlow(p1if = insideFetch())
+        return newFlow
 //        PipeBuffer.pif_deprecated = insideFetch()
     }
 }

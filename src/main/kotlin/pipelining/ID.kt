@@ -1,21 +1,20 @@
 package org.cuttlefish.pipelining
 
-import org.cuttlefish.data.DecodeInstruction
-import org.cuttlefish.data.PipeBuffer
-import org.cuttlefish.data.Register
-import org.cuttlefish.data.RegisterAddress
-import org.cuttlefish.data.RegisterValue
+import org.cuttlefish.DataFlow
+import org.cuttlefish.DecodeOutput
+import org.cuttlefish.data.*
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
+import org.cuttlefish.util.Maybe
 
 
 /**
  * 2 Decode instruction and read registers
  */
-class ID {
-    
+class ID(val p1ifDataFlow: DataFlow) {
+
     val fetchedInstructions = PipeBuffer.p1if.p1if
-    
+
     val name = name()
     val fmt = mappings[name]!![3] as InstructionType
     fun name(): String {
@@ -87,7 +86,8 @@ class ID {
                 val halfImmediate1 = (fetchedInstructions!![0]!!.toInt() shl 8).toUShort().toInt() shr 8
                 val imm1 = halfImmediate1.toShort()
                 val register =
-                    Register.entries[((fetchedInstructions[0]!!.toInt() shl 5).toUShort().toInt() shr 16 - 3).toUShort().toInt()]
+                    Register.entries[((fetchedInstructions[0]!!.toInt() shl 5).toUShort().toInt() shr 16 - 3).toUShort()
+                        .toInt()]
 
                 val removedOpcode2 = (fetchedInstructions[1]!!.toInt() shl 5).toUShort()
                 val half2 = (removedOpcode2.toInt() shr 16 - 1).toUShort()
@@ -156,19 +156,31 @@ class ID {
 
     }
 
-    suspend fun decode() {
+    suspend fun decode(): DataFlow {
 //        println("decoding")
-        PipeBuffer.p2id.decode
-
-
-        PipeBuffer.pid_deprecated = DecodeInstruction(
-            full1 = fetchedInstructions!![0]!!,
-            full2 = fetchedInstructions[1],
-            name = name,
-            format = fmt,
-            structure = fmtStructure(),
-            registerStructure = fillInRegisters()
+        val newFlow = p1ifDataFlow.copy(
+            decode = Maybe.Some(
+                DecodeOutput(
+                    name = name,
+                    full1 = fetchedInstructions!![0]!!,
+                    full2 = fetchedInstructions[1],
+                    format = fmt,
+                    structure = fmtStructure(),
+                    registerStructure = fillInRegisters(),
+                )
+            )
         )
+        return newFlow
+
+//
+//        PipeBuffer.pid_deprecated = DecodeInstruction(
+//            full1 = fetchedInstructions!![0]!!,
+//            full2 = fetchedInstructions[1],
+//            name = name,
+//            format = fmt,
+//            structure = fmtStructure(),
+//            registerStructure = fillInRegisters()
+//        )
     }
 
 }

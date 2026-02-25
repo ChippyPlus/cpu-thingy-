@@ -2,7 +2,7 @@ package org.cuttlefish.pipelining
 
 import org.cuttlefish.data.Memory
 import org.cuttlefish.data.PipeBuffer
-import org.cuttlefish.data.WriteBackOutput
+import org.cuttlefish.data.WriteBackOutput_old
 
 
 /**
@@ -26,7 +26,7 @@ class MEM {
                 val addressToRead = input.location.value
                 val memValue = Memory.read(addressToRead)
 
-                PipeBuffer.pwb_deprecated = WriteBackOutput(
+                PipeBuffer.pwb_deprecated = WriteBackOutput_old(
                     value = memValue, location = input.optionalRegisterLocation!!
                 )
 //                println("MEM: Loaded $memValue from $addressToRead, sending to ${input.optionalRegisterLocation}")
