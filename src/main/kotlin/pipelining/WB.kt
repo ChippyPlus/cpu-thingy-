@@ -4,9 +4,7 @@ import org.cuttlefish.DataFlow
 import org.cuttlefish.util.Maybe
 
 
-/**
- * 5 Write the result into a register
- */
+
 class WB(val p4memDataFlow: DataFlow) {
 
     suspend fun writeBack() = when (val wb = p4memDataFlow.writeBack) {

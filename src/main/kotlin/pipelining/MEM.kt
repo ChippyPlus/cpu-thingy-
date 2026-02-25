@@ -9,9 +9,6 @@ import org.cuttlefish.data.WriteBackOutput_old
 import org.cuttlefish.util.Maybe
 
 
-/**
- * 4 Access an operand in data memory
- */
 class MEM(val p3exDataFlow: DataFlow) {
 
     suspend fun memoryWriteBack(): DataFlow = when (val x = PipeBuffer.p3ex.aluResult) {

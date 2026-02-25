@@ -8,9 +8,6 @@ import org.cuttlefish.instructions.InstructionType
 import org.cuttlefish.util.Maybe
 
 
-/**
- * 2 Decode instruction and read registers
- */
 class ID(val p1ifDataFlow: DataFlow) {
 
     val fetchedInstructions = PipeBuffer.p1if.p1if

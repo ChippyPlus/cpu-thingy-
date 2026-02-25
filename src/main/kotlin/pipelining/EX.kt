@@ -19,9 +19,7 @@ sealed interface EXResult {
     object Empty : EXResult
 }
 
-/**
- * 3 Execute the operation or calculate address
- */
+
 class EX(val p2idDataFlow: DataFlow) {
     var aluResult: AluResult? = null
 
@@ -133,7 +131,7 @@ class EX(val p2idDataFlow: DataFlow) {
             }
         }
 
-        is Maybe.Not -> throw IllegalStateException()
+        is Maybe.Not -> {}
     }
 
     suspend fun execute(): DataFlow {
