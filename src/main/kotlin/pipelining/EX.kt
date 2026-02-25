@@ -4,7 +4,7 @@ import org.cuttlefish.data.*
 import org.cuttlefish.instructions.Instruction.mappings
 import org.cuttlefish.instructions.InstructionType
 
-
+@Deprecated("In favour of DataFlow")
 sealed interface EXResult {
     data class Register(val returns: WriteBackOutput, val arguments: List<Any>) : EXResult
     data class Memory(val returns: MEMWruteBackOutput, val arguments: List<Any>) : EXResult
@@ -17,7 +17,7 @@ sealed interface EXResult {
 class EX {
     fun execute() {
 //        println("executing")
-        val decoded = PipeBuffer.pid!!
+        val decoded = PipeBuffer.pid_deprecated!!
         val name = decoded.name
         val fmt = decoded.format
         val kFunctionExe = mappings[name]!![0]
@@ -104,12 +104,12 @@ class EX {
 
         when (result) {
             is EXResult.Register -> {
-                PipeBuffer.pwb = result.returns
+                PipeBuffer.pwb_deprecated = result.returns
 
             }
 
             is EXResult.Memory -> {
-                PipeBuffer.pmem = result.returns
+                PipeBuffer.pmem_deprecated = result.returns
             }
 
             is EXResult.Empty -> {}

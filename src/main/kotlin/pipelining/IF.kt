@@ -34,7 +34,8 @@ class IF {
     }
 
     suspend fun fetch() {
-//        println("Fetching")
-        PipeBuffer.pif = insideFetch()
+        PipeBuffer.p1if.p1if = insideFetch()
+
+//        PipeBuffer.pif_deprecated = insideFetch()
     }
 }

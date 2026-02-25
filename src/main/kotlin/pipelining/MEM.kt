@@ -11,7 +11,7 @@ import org.cuttlefish.data.WriteBackOutput
 class MEM {
 
     suspend fun memoryWriteBack() {
-        val input = PipeBuffer.pmem ?: return
+        val input = PipeBuffer.pmem_deprecated ?: return
 
         //  NO FUCKING TIME TRAVEL
         when (input.opName) {
@@ -26,7 +26,7 @@ class MEM {
                 val addressToRead = input.location.value
                 val memValue = Memory.read(addressToRead)
 
-                PipeBuffer.pwb = WriteBackOutput(
+                PipeBuffer.pwb_deprecated = WriteBackOutput(
                     value = memValue, location = input.optionalRegisterLocation!!
                 )
 //                println("MEM: Loaded $memValue from $addressToRead, sending to ${input.optionalRegisterLocation}")
@@ -37,7 +37,7 @@ class MEM {
             }
         }
 
-        PipeBuffer.pmem = null
+        PipeBuffer.pmem_deprecated = null
     }
 }
 

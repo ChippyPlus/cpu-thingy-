@@ -7,6 +7,7 @@ import org.cuttlefish.util.Maybe
 
 
 data class DataFlow(
+    var p1if: List<UShort?>? = null,
     val decode: Maybe<DecodeOutput> = Maybe.None,
     val writeBack: Maybe<WriteBackOutput> = Maybe.None,
     val memWrite: Maybe<MemWriteOutput> = Maybe.None
@@ -23,13 +24,9 @@ data class DecodeOutput(
 )
 
 data class WriteBackOutput(
-    val value: Short,
-    val location: RegisterAddress
+    val value: Short, val location: RegisterAddress
 )
 
 data class MemWriteOutput(
-    val value: Short,
-    val location: MemoryAddress,
-    val opName: Char,
-    val optionalRegisterLocation: RegisterAddress?
+    val value: Short, val location: MemoryAddress, val opName: Char, val optionalRegisterLocation: RegisterAddress?
 )

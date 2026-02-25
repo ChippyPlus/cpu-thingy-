@@ -10,9 +10,9 @@ class WB {
 
     suspend fun writeBack() {
 //        println("writing backing")
-        if (PipeBuffer.pwb != null) {
-            val value = PipeBuffer.pwb!!.value
-            val location = PipeBuffer.pwb!!.location.value
+        if (PipeBuffer.pwb_deprecated != null) {
+            val value = PipeBuffer.pwb_deprecated!!.value
+            val location = PipeBuffer.pwb_deprecated!!.location.value
             location.write(value)
         }
     }

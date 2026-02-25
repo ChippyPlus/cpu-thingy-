@@ -13,25 +13,26 @@ import org.cuttlefish.instructions.InstructionType
  * 2 Decode instruction and read registers
  */
 class ID {
-
+    
+    val fetchedInstructions = PipeBuffer.p1if.p1if
     
     val name = name()
     val fmt = mappings[name]!![3] as InstructionType
     fun name(): String {
-        val number = (PipeBuffer.pif!![0]!!.toInt() shr 16 - 5).toUShort()
+        val number = (fetchedInstructions!![0]!!.toInt() shr 16 - 5).toUShort()
         return mappings.entries.map { it.value[2] to it.key }.find { it.first == number.toInt() }!!.second
     }
 
     fun fmtStructure(): List<Any> {
         when (mappings[name]!![3] as InstructionType) {
             InstructionType.Register1 -> {
-                val removedOpcode = (PipeBuffer.pif!![0]!!.toInt() shl 5).toUShort()
+                val removedOpcode = (fetchedInstructions!![0]!!.toInt() shl 5).toUShort()
                 val shift = (removedOpcode.toInt() shr 16 - 3).toUShort()
                 return listOf(name, Register.entries[shift.toInt()]) // the only unique data
             }
 
             InstructionType.Register3 -> {
-                val removedOpcode = (PipeBuffer.pif!![0]!!.toInt() shl 5).toUShort()
+                val removedOpcode = (fetchedInstructions!![0]!!.toInt() shl 5).toUShort()
                 val shift1 = (removedOpcode.toInt() shr 16 - 3).toUShort()
                 val shift2 = ((removedOpcode.toInt() shl 3).toUShort().toInt() shr 16 - 3).toUShort()
                 val shift3 = ((removedOpcode.toInt() shl 6).toUShort().toInt() shr 16 - 3).toUShort()
@@ -44,7 +45,7 @@ class ID {
             }
 
             InstructionType.Register2 -> {
-                val removedOpcode = (PipeBuffer.pif!![0]!!.toInt() shl 5).toUShort()
+                val removedOpcode = (fetchedInstructions!![0]!!.toInt() shl 5).toUShort()
                 val shift1 = (removedOpcode.toInt() shr 16 - 3).toUShort()
                 val shift2 = ((removedOpcode.toInt() shl 3).toUShort().toInt() shr 16 - 3).toUShort()
                 return listOf(
@@ -53,18 +54,18 @@ class ID {
             }
 
             InstructionType.Immediates -> {
-                val removedOpcode1 = (PipeBuffer.pif!![0]!!.toInt() shl 5).toUShort()
+                val removedOpcode1 = (fetchedInstructions!![0]!!.toInt() shl 5).toUShort()
                 val half1 = (removedOpcode1.toInt() shr 16 - 1).toUShort()
-                val halfImmediate1 = (PipeBuffer.pif!![0]!!.toInt() shl 6).toUShort().toInt() shr 8
+                val halfImmediate1 = (fetchedInstructions[0]!!.toInt() shl 6).toUShort().toInt() shr 8
                 val immediate1 = if (half1.toUInt() == 1u) {
                     halfImmediate1.toShort()
                 } else if (half1.toUInt() == 0u) {
                     (halfImmediate1.toShort().toInt() shl 8).toShort()
                 } else throw IllegalStateException("Half ≠ 0 or 1, impossible?")
 
-                val removedOpcode2 = (PipeBuffer.pif!![1]!!.toInt() shl 5).toUShort()
+                val removedOpcode2 = (fetchedInstructions[1]!!.toInt() shl 5).toUShort()
                 val half2 = (removedOpcode2.toInt() shr 16 - 1).toUShort()
-                val halfImmediate2 = (PipeBuffer.pif!![1]!!.toInt() shl 6).toUShort().toInt() shr 8
+                val halfImmediate2 = (fetchedInstructions[1]!!.toInt() shl 6).toUShort().toInt() shr 8
                 val immediate2 = if (half2.toUInt() == 1u) {
                     halfImmediate2.toShort()
                 } else if (half2.toUInt() == 0u) {
@@ -83,14 +84,14 @@ class ID {
             }
 
             InstructionType.RegisterImmediates -> {
-                val halfImmediate1 = (PipeBuffer.pif!![0]!!.toInt() shl 8).toUShort().toInt() shr 8
+                val halfImmediate1 = (fetchedInstructions!![0]!!.toInt() shl 8).toUShort().toInt() shr 8
                 val imm1 = halfImmediate1.toShort()
                 val register =
-                    Register.entries[((PipeBuffer.pif!![0]!!.toInt() shl 5).toUShort().toInt() shr 16 - 3).toUShort().toInt()]
+                    Register.entries[((fetchedInstructions[0]!!.toInt() shl 5).toUShort().toInt() shr 16 - 3).toUShort().toInt()]
 
-                val removedOpcode2 = (PipeBuffer.pif!![1]!!.toInt() shl 5).toUShort()
+                val removedOpcode2 = (fetchedInstructions[1]!!.toInt() shl 5).toUShort()
                 val half2 = (removedOpcode2.toInt() shr 16 - 1).toUShort()
-                val halfImmediate2 = (PipeBuffer.pif!![1]!!.toInt() shl 6).toUShort().toInt() shr 8
+                val halfImmediate2 = (fetchedInstructions[1]!!.toInt() shl 6).toUShort().toInt() shr 8
                 val immediate2 = if (half2.toUInt() == 1u) {
                     halfImmediate2.toShort()
                 } else if (half2.toUInt() == 0u) {
@@ -157,9 +158,12 @@ class ID {
 
     suspend fun decode() {
 //        println("decoding")
-        PipeBuffer.pid = DecodeInstruction(
-            full1 = PipeBuffer.pif!![0]!!,
-            full2 = PipeBuffer.pif!![1],
+        PipeBuffer.p2id.decode
+
+
+        PipeBuffer.pid_deprecated = DecodeInstruction(
+            full1 = fetchedInstructions!![0]!!,
+            full2 = fetchedInstructions[1],
             name = name,
             format = fmt,
             structure = fmtStructure(),
