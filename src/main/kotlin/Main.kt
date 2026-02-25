@@ -1,5 +1,6 @@
 package org.cuttlefish
 
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.cuttlefish.data.Clock
 import org.cuttlefish.data.Memory
@@ -31,19 +32,24 @@ suspend fun main() = coroutineScope {
 }
 
 
-suspend fun cycle(cycle: Int) {
+suspend fun cycle(cycle: Int) = coroutineScope {
 
 
-    val retired = PipeBuffer.p5wb
-    PipeBuffer.p5wb = PipeBuffer.p4mm
-    PipeBuffer.p4mm = PipeBuffer.p3ex
-    PipeBuffer.p3ex = PipeBuffer.p2id
-    PipeBuffer.p2id = PipeBuffer.p1if
+    val ifResult = async { IF().fetch() }
+    val idResult = async { ID(PipeBuffer.p1if).decode() }
+    val exResult = async { EX(PipeBuffer.p2id).execute() }
+    val memResult = async { MEM(PipeBuffer.p3ex).memoryWriteBack() }
+    val wbResult = async { WB(PipeBuffer.p4mm).writeBack() }
 
+//    val computeDispatchers = listOf(
+//        IF(), ID(PipeBuffer.p1if), EX(PipeBuffer.p2id), MEM(PipeBuffer.p3ex), WB(PipeBuffer.p4mm)
+//    )
+    val retiredInstruction = PipeBuffer.p4mm
 
-    val s1 = IF(PipeBuffer.p1if).fetch()
-    val s2 = ID(s1).decode()
-    val s3 = EX(s2).execute()
-    val s4 = MEM(s3).memoryWriteBack()
-    val s5 = WB(s4).writeBack()
+    PipeBuffer.p1if = ifResult.await()
+    PipeBuffer.p2id = idResult.await()
+    PipeBuffer.p3ex = exResult.await()
+    PipeBuffer.p4mm = memResult.await()
+    PipeBuffer.p5wb = retiredInstruction
+    wbResult.await()
 }

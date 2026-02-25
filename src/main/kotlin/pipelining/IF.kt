@@ -10,7 +10,7 @@ import org.cuttlefish.instructions.InstructionType
 /**
  * 1 Fetch instruction from memory
  */
-class IF(var newFlow: DataFlow = DataFlow()) {
+class IF {
     private val opcodeMap = mappings.values.associate { (it[2] as Number).toInt() to (it[3] as InstructionType) }
 
     private suspend fun insideFetch(): List<UShort?> {
@@ -35,8 +35,6 @@ class IF(var newFlow: DataFlow = DataFlow()) {
     }
 
     suspend fun fetch(): DataFlow {
-        newFlow = DataFlow(p1if = insideFetch())
-        return newFlow
-//        PipeBuffer.pif_deprecated = insideFetch()
+        return DataFlow(p1if = insideFetch())
     }
 }
