@@ -43,7 +43,7 @@ value class RegisterAddress(val value: Register)
 @JvmInline
 value class MemoryAddress(val value: Short)
 
-
+@Deprecated("In favour of DataFlow")
 data class DecodeInstruction(
     val full1: UShort,
     val full2: UShort?,
@@ -53,8 +53,16 @@ data class DecodeInstruction(
     val registerStructure: List<Any>,
 )
 
-data class WriteBackOutput(val value: Short, val location: RegisterAddress)
+@Deprecated("In favour of DataFlow")
+data class WriteBackOutput(
+    val value: Short,
+    val location: RegisterAddress
+)
+
+@Deprecated("In favour of DataFlow")
 data class MEMWruteBackOutput(
-    val value: Short, val location: MemoryAddress, val opName: Char,
+    val value: Short,
+    val location: MemoryAddress,
+    val opName: Char,
     val optionalRegisterLocation: RegisterAddress?
 )
