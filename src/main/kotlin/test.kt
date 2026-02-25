@@ -60,6 +60,7 @@ suspend fun main() = coroutineScope {
     val pipeline = Pipeline()
     val clock = Clock(maxCycles = 13)
 
+
     while (clock.tick { cycle -> pipeline.step(cycle) }) {}
 
 }

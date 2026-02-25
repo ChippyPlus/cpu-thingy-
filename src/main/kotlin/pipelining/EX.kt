@@ -42,7 +42,9 @@ class EX(val p2idDataFlow: DataFlow) {
                         AluResult.Register(WriteBackOutput(value = res.value, location = res.location))
 
                     } else {
-                        @Suppress("UNCHECKED_CAST") (kFunctionExe as suspend (RegisterValue) -> Unit).invoke(fmtStructure[1] as RegisterValue)
+                        @Suppress("UNCHECKED_CAST") (kFunctionExe as suspend (RegisterValue) -> Unit).invoke(
+                            fmtStructure[1] as RegisterValue
+                        )
                         AluResult.Empty
                     }
                 }
@@ -134,7 +136,7 @@ class EX(val p2idDataFlow: DataFlow) {
         is Maybe.Not -> throw IllegalStateException()
     }
 
-    suspend fun execute(): DataFlow? {
+    suspend fun execute(): DataFlow {
         innerExecute()
         return when (val r = aluResult!!) {
             is AluResult.Register -> {
@@ -145,7 +147,7 @@ class EX(val p2idDataFlow: DataFlow) {
                 p2idDataFlow.copy(memWrite = Maybe.Some(r.returns))
             }
 
-            is AluResult.Empty -> null
+            is AluResult.Empty -> p2idDataFlow
         }
     }
 
